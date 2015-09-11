@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class Tube extends Game {
+public class TubeGame extends Game {
 	public final static int GAME_WIDTH = 1600;
 	public final static int GAME_HEIGHT = 900;
 	public SpriteBatch batch;

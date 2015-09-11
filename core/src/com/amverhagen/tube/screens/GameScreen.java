@@ -5,8 +5,10 @@ import com.amverhagen.tube.components.Drawable;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.game.Tube;
+import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
+import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.DrawingSystem;
+import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
@@ -17,18 +19,20 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 
 public class GameScreen implements Screen {
-	private Tube game;
+	private TubeGame game;
 	private World artWorld;
 
-	public GameScreen(Tube game) {
+	public GameScreen(TubeGame game) {
 		this.game = game;
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(DrawingSystem.class);
 		worldConfig.setSystem(MoveInDirectionSystem.class);
+		worldConfig.setSystem(ShiftDirectionLeftOrRightByPressSystem.class);
 		artWorld = new World(worldConfig);
-		new EntityBuilder(artWorld).with(new Position(0, 0), new Body(3, 3),
+		new EntityBuilder(artWorld).with(new Position(0, 0), new Body(.5f, .5f),
 				new Drawable(new Texture(Gdx.files.internal("green_circle.png")), game.batch),
-				new MovementDirection(MovementDirection.Direction.NORTH), new MovementSpeed(1f)).build();
+				new MovementDirection(MovementDirection.Direction.NORTH), new MovementSpeed(5f),
+				new SetMoveDirectionBasedOnRightOrLeftPress(game.camera)).build();
 	}
 
 	@Override
