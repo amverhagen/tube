@@ -1,0 +1,40 @@
+
+breakSprites.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bk0
+  rotate: false
+  xy: 2, 2
+  size: 90, 135
+  orig: 90, 135
+  offset: 0, 0
+  index: -1
+bk1
+  rotate: false
+  xy: 94, 2
+  size: 90, 135
+  orig: 90, 135
+  offset: 0, 0
+  index: -1
+bk2
+  rotate: false
+  xy: 186, 2
+  size: 90, 135
+  orig: 90, 135
+  offset: 0, 0
+  index: -1
+bk3
+  rotate: false
+  xy: 278, 2
+  size: 90, 135
+  orig: 90, 135
+  offset: 0, 0
+  index: -1
+bk4
+  rotate: false
+  xy: 370, 2
+  size: 90, 135
+  orig: 90, 135
+  offset: 0, 0
+  index: -1
