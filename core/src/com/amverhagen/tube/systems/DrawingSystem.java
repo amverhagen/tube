@@ -8,8 +8,10 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
 import com.artemis.systems.EntityProcessingSystem;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class DrawingSystem extends EntityProcessingSystem {
+	private SpriteBatch batch;
 	@Wire
 	ComponentMapper<Position> positionMapper;
 	@Wire
@@ -18,9 +20,15 @@ public class DrawingSystem extends EntityProcessingSystem {
 	ComponentMapper<Drawable> drawMapper;
 
 	@SuppressWarnings("unchecked")
-	public DrawingSystem() {
+	public DrawingSystem(SpriteBatch batch) {
 		super(Aspect.all(Position.class, Body.class, Drawable.class));
+		this.batch = batch;
 	}
+
+	@Override
+	protected void begin() {
+		this.batch.begin();
+	};
 
 	@Override
 	protected void process(Entity e) {
@@ -31,4 +39,8 @@ public class DrawingSystem extends EntityProcessingSystem {
 		drawComp.batch.draw(drawComp.texture, posComp.x, posComp.y, bodyComp.width, bodyComp.height);
 	}
 
+	@Override
+	protected void end() {
+		this.batch.end();
+	}
 }
