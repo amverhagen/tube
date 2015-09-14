@@ -7,8 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 public class RecordConnectedPoints extends com.artemis.Component {
 	public ConnectedPointList points;
 
-	public RecordConnectedPoints() {
-		this.points = new ConnectedPointList();
+	public RecordConnectedPoints(int numberOfPoints) {
+		this.points = new ConnectedPointList(numberOfPoints);
 	}
 
 	public class ConnectedPointList {
@@ -16,14 +16,18 @@ public class RecordConnectedPoints extends com.artemis.Component {
 		private ConnectedPoint mostRecentlyAddedPoint;
 		private int currentPointIndex;
 
-		public ConnectedPointList() {
-			this.connectedPoints = new ConnectedPoint[20];
+		public ConnectedPointList(int numOfPoints) {
+			this.connectedPoints = new ConnectedPoint[numOfPoints];
 			this.currentPointIndex = 0;
-			this.mostRecentlyAddedPoint = new ConnectedPoint(0, 0, null);
+			this.mostRecentlyAddedPoint = null;
 		}
 
 		public void addPoint(float x, float y) {
-			connectedPoints[currentPointIndex] = new ConnectedPoint(x, y, mostRecentlyAddedPoint);
+			if (mostRecentlyAddedPoint == null) {
+				connectedPoints[currentPointIndex] = new ConnectedPoint(x, y, new ConnectedPoint(x, y, null));
+			} else {
+				connectedPoints[currentPointIndex] = new ConnectedPoint(x, y, mostRecentlyAddedPoint);
+			}
 			mostRecentlyAddedPoint = connectedPoints[currentPointIndex];
 			currentPointIndex++;
 			if (currentPointIndex >= connectedPoints.length - 1) {

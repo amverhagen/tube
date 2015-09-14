@@ -1,7 +1,7 @@
 package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
-import com.amverhagen.tube.components.Body;
+import com.amverhagen.tube.components.DrawingDimension;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.artemis.Aspect;
@@ -13,20 +13,20 @@ public class AddConnectedPointsFromEntityCenterSystem extends com.artemis.system
 	@Wire
 	ComponentMapper<RecordConnectedPoints> recordedPointsMapper;
 	@Wire
-	ComponentMapper<Body> bodyMapper;
+	ComponentMapper<DrawingDimension> bodyMapper;
 	@Wire
 	ComponentMapper<Position> positionMapper;
 
 	@SuppressWarnings("unchecked")
 	public AddConnectedPointsFromEntityCenterSystem() {
-		super(Aspect.all(RecordConnectedPoints.class, AddConnectedPointsFromEntityCenter.class, Body.class,
+		super(Aspect.all(RecordConnectedPoints.class, AddConnectedPointsFromEntityCenter.class, DrawingDimension.class,
 				Position.class));
 	}
 
 	@Override
 	protected void process(Entity e) {
 		RecordConnectedPoints recordedPointsComp = recordedPointsMapper.get(e);
-		Body bodyComp = bodyMapper.get(e);
+		DrawingDimension bodyComp = bodyMapper.get(e);
 		Position positionComp = positionMapper.get(e);
 		float x = positionComp.x + (bodyComp.width / 2);
 		float y = positionComp.y + (bodyComp.height / 2);

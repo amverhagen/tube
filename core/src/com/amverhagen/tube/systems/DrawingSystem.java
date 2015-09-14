@@ -1,6 +1,6 @@
 package com.amverhagen.tube.systems;
 
-import com.amverhagen.tube.components.Body;
+import com.amverhagen.tube.components.DrawingDimension;
 import com.amverhagen.tube.components.Drawable;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Aspect;
@@ -15,13 +15,13 @@ public class DrawingSystem extends EntityProcessingSystem {
 	@Wire
 	ComponentMapper<Position> positionMapper;
 	@Wire
-	ComponentMapper<Body> bodyMapper;
+	ComponentMapper<DrawingDimension> bodyMapper;
 	@Wire
 	ComponentMapper<Drawable> drawMapper;
 
 	@SuppressWarnings("unchecked")
 	public DrawingSystem(SpriteBatch batch) {
-		super(Aspect.all(Position.class, Body.class, Drawable.class));
+		super(Aspect.all(Position.class, DrawingDimension.class, Drawable.class));
 		this.batch = batch;
 	}
 
@@ -33,7 +33,7 @@ public class DrawingSystem extends EntityProcessingSystem {
 	@Override
 	protected void process(Entity e) {
 		Position posComp = positionMapper.get(e);
-		Body bodyComp = bodyMapper.get(e);
+		DrawingDimension bodyComp = bodyMapper.get(e);
 		Drawable drawComp = drawMapper.get(e);
 
 		drawComp.batch.draw(drawComp.texture, posComp.x, posComp.y, bodyComp.width, bodyComp.height);

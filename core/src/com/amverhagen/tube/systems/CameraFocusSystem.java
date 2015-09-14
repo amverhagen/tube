@@ -1,6 +1,6 @@
 package com.amverhagen.tube.systems;
 
-import com.amverhagen.tube.components.Body;
+import com.amverhagen.tube.components.DrawingDimension;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Aspect;
@@ -14,18 +14,18 @@ public class CameraFocusSystem extends com.artemis.systems.EntityProcessingSyste
 	@Wire
 	ComponentMapper<Position> positionMapper;
 	@Wire
-	ComponentMapper<Body> bodyMapper;
+	ComponentMapper<DrawingDimension> bodyMapper;
 
 	@SuppressWarnings("unchecked")
 	public CameraFocusSystem() {
-		super(Aspect.all(CameraFocus.class, Position.class, Body.class));
+		super(Aspect.all(CameraFocus.class, Position.class, DrawingDimension.class));
 	}
 
 	@Override
 	protected void process(Entity e) {
 		CameraFocus cameraComp = cameraMapper.get(e);
 		Position positionComp = positionMapper.get(e);
-		Body bodyComp = bodyMapper.get(e);
+		DrawingDimension bodyComp = bodyMapper.get(e);
 		float x = positionComp.x + (bodyComp.width / 2);
 		float y = positionComp.y + (bodyComp.height / 2);
 		cameraComp.camera.position.set(x, y, 0);

@@ -26,7 +26,6 @@ public class RenderConnectedPointsSystem extends com.artemis.systems.EntityProce
 	@Override
 	protected void begin() {
 		this.renderer.begin();
-
 	}
 
 	@Override
