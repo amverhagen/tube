@@ -36,7 +36,7 @@ public class DrawingSystem extends EntityProcessingSystem {
 		DrawingDimension bodyComp = bodyMapper.get(e);
 		Drawable drawComp = drawMapper.get(e);
 
-		drawComp.batch.draw(drawComp.texture, posComp.x, posComp.y, bodyComp.width, bodyComp.height);
+		batch.draw(drawComp.texture, posComp.x, posComp.y, bodyComp.width, bodyComp.height);
 	}
 
 	@Override
