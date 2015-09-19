@@ -1,5 +1,7 @@
 package com.amverhagen.tube.tubes;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.math.Vector2;
 
 public class Tube {
@@ -35,20 +37,6 @@ public class Tube {
 				this.bounds = new Vector2(1, 3);
 			} else if (direction == Direction.EAST || direction == Direction.WEST) {
 				this.bounds = new Vector2(3, 1);
-			}
-			break;
-		case MEDIUM:
-			if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-				this.bounds = new Vector2(1, 5);
-			} else if (direction == Direction.EAST || direction == Direction.WEST) {
-				this.bounds = new Vector2(5, 1);
-			}
-			break;
-		case LONG:
-			if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-				this.bounds = new Vector2(1, 7);
-			} else if (direction == Direction.EAST || direction == Direction.WEST) {
-				this.bounds = new Vector2(7, 1);
 			}
 			break;
 		default:
@@ -116,6 +104,13 @@ public class Tube {
 	}
 
 	public enum Type {
-		LONG, MEDIUM, SHORT, COUNTER, CLOCK;
+		SHORT, COUNTER, CLOCK;
+		public static ArrayList<Type> getTypeList() {
+			ArrayList<Type> types = new ArrayList<Type>();
+			types.add(SHORT);
+			types.add(COUNTER);
+			types.add(CLOCK);
+			return types;
+		}
 	}
 }

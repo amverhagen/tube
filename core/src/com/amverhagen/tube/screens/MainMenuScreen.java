@@ -1,7 +1,10 @@
 package com.amverhagen.tube.screens;
 
+import java.util.ArrayList;
+
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Clickable;
+import com.amverhagen.tube.components.DrawLineAroundBody;
 import com.amverhagen.tube.components.Drawable;
 import com.amverhagen.tube.components.DrawingDimension;
 import com.amverhagen.tube.components.MovementDirection;
@@ -10,6 +13,7 @@ import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.UIRenderable;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.UiClickSystem;
+import com.amverhagen.tube.tubes.ConnectedTubeMaker;
 import com.amverhagen.tube.tubes.Tube;
 import com.amverhagen.tube.tubes.Tube.Direction;
 import com.amverhagen.tube.tubes.Tube.Type;
@@ -17,6 +21,7 @@ import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.DrawingSystem;
 import com.amverhagen.tube.systems.MoveInAngleDirectionSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
+import com.amverhagen.tube.systems.RenderBoxSystem;
 import com.amverhagen.tube.systems.RenderUISystem;
 import com.artemis.Entity;
 import com.artemis.World;
@@ -24,6 +29,7 @@ import com.artemis.WorldConfiguration;
 import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -48,20 +54,18 @@ public class MainMenuScreen implements Screen {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(new UiClickSystem(game.uiCamera));
 		worldConfig.setSystem(MoveInAngleDirectionSystem.class);
-		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(MoveInDirectionSystem.class);
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
 		worldConfig.setSystem(new RenderUISystem(game.uiBatch, game.uiCamera));
+		worldConfig.setSystem(new RenderBoxSystem(game.shapeRenderer));
 		world = new World(worldConfig);
 	}
 
 	public void createTrail() {
-		Tube tube = new Tube(new Vector2(0, 0), Type.SHORT, Direction.EAST);
-		this.addTubeToWorld(tube);
-		tube = new Tube(tube, Type.CLOCK);
-		this.addTubeToWorld(tube);
-		tube = new Tube(tube, Type.SHORT);
-		this.addTubeToWorld(tube);
+		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(100, new Vector2(0, 0));
+		for (Tube t : tubes) {
+			this.addTubeToWorld(t);
+		}
 	}
 
 	public void createButtons() {
@@ -74,16 +78,16 @@ public class MainMenuScreen implements Screen {
 	public void createBall() {
 		ball = new EntityBuilder(world).with(new Position(0, 0), new DrawingDimension(.5f, .5f),
 				new Drawable(new Texture(Gdx.files.internal("green_circle.png"))),
-				new MovementDirection(MovementDirection.Direction.EAST), new MovementSpeed(1f),
-				new CameraFocus(game.gameCamera)).build();
+				new MovementDirection(MovementDirection.Direction.EAST), new MovementSpeed(1f)).build();
 	}
 
 	public void addTubeToWorld(Tube t) {
 		Entity tube = world.createEntity();
-		Drawable dc = new Drawable(new Texture(Gdx.files.internal("pipe.png")));
+		DrawLineAroundBody dlac = new DrawLineAroundBody();
+		Drawable dc = new Drawable(new Texture(Gdx.files.internal("black.png")));
 		Position pc = new Position(t.getPosition());
 		DrawingDimension ddc = new DrawingDimension(t.getBounds());
-		tube.edit().add(dc).add(pc).add(ddc);
+		tube.edit().add(dc).add(pc).add(ddc).add(dlac);
 	}
 
 	public Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body) {
@@ -108,9 +112,22 @@ public class MainMenuScreen implements Screen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(1, 1, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		game.gameCamera.update();
+		game.uiCamera.update();
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
-
+		if (Gdx.input.isKeyPressed(Keys.UP)) {
+			game.gameCamera.position.y += 1f * delta;
+		}
+		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+			game.gameCamera.position.y -= 1f * delta;
+		}
+		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+			game.gameCamera.position.x += 1f * delta;
+		}
+		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+			game.gameCamera.position.x -= 1f * delta;
+		}
 		world.setDelta(delta);
 		world.process();
 	}
