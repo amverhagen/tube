@@ -41,9 +41,10 @@ public class GameScreen implements Screen {
 	public GameScreen(TubeGame game) {
 		this.game = game;
 		WorldConfiguration worldConfig = new WorldConfiguration();
-		worldConfig.setManager(TagManager.class);
-		worldConfig.setSystem(CheckPlayerCollisionSystem.class);
-		worldConfig.setSystem(new RenderConnectedPointsSystem(game.shapeRenderer));
+		// worldConfig.setManager(TagManager.class);
+		// worldConfig.setSystem(CheckPlayerCollisionSystem.class);
+		// worldConfig.setSystem(new
+		// RenderConnectedPointsSystem(game.shapeRenderer));
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
 		worldConfig.setSystem(MoveInDirectionSystem.class);
 		worldConfig.setSystem(ShiftDirectionLeftOrRightByPressSystem.class);
@@ -113,12 +114,14 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(1, 1, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
-		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
+		// game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
 		artWorld.process();
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		game.viewport.setScreenSize(width, height);
+		game.viewport.apply();
 	}
 
 	@Override

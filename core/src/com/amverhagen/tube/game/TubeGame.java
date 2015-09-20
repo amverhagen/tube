@@ -36,7 +36,6 @@ public class TubeGame extends Game {
 		viewport.getCamera().update();
 
 		uiCamera = new OrthographicCamera();
-
 		uiViewport = new FitViewport(10f, 10f * aspectRatio, uiCamera);
 		uiViewport.apply();
 		uiViewport.getCamera().position.set((float) uiCamera.viewportWidth / 2, (float) uiCamera.viewportHeight / 2, 0);

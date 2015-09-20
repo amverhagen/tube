@@ -26,5 +26,4 @@ public class CameraFocusSystem extends com.artemis.systems.EntityProcessingSyste
 		cameraComp.camera.position.set(positionComp.x, positionComp.y, 0);
 		cameraComp.camera.update();
 	}
-
 }

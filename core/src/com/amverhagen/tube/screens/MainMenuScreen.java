@@ -10,7 +10,6 @@ import com.amverhagen.tube.components.Course;
 import com.amverhagen.tube.components.DrawLineAroundBody;
 import com.amverhagen.tube.components.Drawable;
 import com.amverhagen.tube.components.DrawingDimension;
-import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.UIRenderable;
@@ -18,8 +17,6 @@ import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.tubes.ConnectedTubeMaker;
 import com.amverhagen.tube.tubes.Tube;
-import com.amverhagen.tube.tubes.Tube.Direction;
-import com.amverhagen.tube.tubes.Tube.Type;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.DrawingSystem;
 import com.amverhagen.tube.systems.MoveEntityAroundCourse;
@@ -33,7 +30,6 @@ import com.artemis.WorldConfiguration;
 import com.artemis.utils.EntityBuilder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -70,7 +66,7 @@ public class MainMenuScreen implements Screen {
 
 	public void createTrail() {
 		course = new LinkedListQueue<Vector2>();
-		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(10, new Vector2(0, 0));
+		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(100, new Vector2(0, 0));
 		for (Tube t : tubes) {
 			this.addTubeToWorld(t);
 		}
@@ -85,8 +81,8 @@ public class MainMenuScreen implements Screen {
 
 	public void createBall() {
 		ball = new EntityBuilder(world).with(new Position(course.dequeue()), new DrawingDimension(.5f, .5f),
-				new CameraFocus(game.gameCamera), new Drawable(new Texture(Gdx.files.internal("green_circle.png"))),
-				new MovementSpeed(4f), new Course(course)).build();
+				new CameraFocus(game.gameCamera), new Course(course),
+				new Drawable(new Texture(Gdx.files.internal("green_circle.png"))), new MovementSpeed(6f)).build();
 	}
 
 	public void addTubeToWorld(Tube t) {
@@ -101,7 +97,6 @@ public class MainMenuScreen implements Screen {
 	}
 
 	public Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body) {
-
 		Entity e = world.createEntity();
 		UIRenderable uic = new UIRenderable(texture);
 		Position pc = new Position(pos);
@@ -122,18 +117,18 @@ public class MainMenuScreen implements Screen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(1, 1, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		game.gameCamera.update();
-		game.uiCamera.update();
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
+		if (delta > .1)
+			delta = .1f;
 		world.setDelta(delta);
 		world.process();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
+		game.viewport.setScreenSize(width, height);
+		game.viewport.apply();
 	}
 
 	@Override

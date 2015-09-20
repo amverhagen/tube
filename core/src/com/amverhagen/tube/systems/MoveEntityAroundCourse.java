@@ -7,6 +7,7 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 public class MoveEntityAroundCourse extends com.artemis.systems.EntityProcessingSystem {
@@ -38,6 +39,8 @@ public class MoveEntityAroundCourse extends com.artemis.systems.EntityProcessing
 			destination = courseComp.course.dequeue();
 		}
 
+		System.out.println(Gdx.graphics.getDeltaTime());
+		System.out.println(world.delta);
 		float distance = world.delta * speedComp.movementSpeed;
 		float slope = (destination.y - posComp.y) / (destination.x - posComp.x);
 		float xDif = (float) Math.sqrt((distance * distance) / ((slope * slope) + 1));
