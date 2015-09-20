@@ -105,11 +105,16 @@ public class Tube {
 
 	public enum Type {
 		SHORT, COUNTER, CLOCK;
-		public static ArrayList<Type> getTypeList() {
+		public static ArrayList<Type> getTurnList() {
 			ArrayList<Type> types = new ArrayList<Type>();
-			types.add(SHORT);
 			types.add(COUNTER);
 			types.add(CLOCK);
+			return types;
+		}
+
+		public static ArrayList<Type> getStraightList() {
+			ArrayList<Type> types = new ArrayList<Type>();
+			types.add(SHORT);
 			return types;
 		}
 	}

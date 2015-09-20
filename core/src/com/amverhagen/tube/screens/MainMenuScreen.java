@@ -2,8 +2,11 @@ package com.amverhagen.tube.screens;
 
 import java.util.ArrayList;
 
+import com.amverhagen.tube.collections.LinkedListQueue;
 import com.amverhagen.tube.components.CameraFocus;
+import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.Clickable;
+import com.amverhagen.tube.components.Course;
 import com.amverhagen.tube.components.DrawLineAroundBody;
 import com.amverhagen.tube.components.Drawable;
 import com.amverhagen.tube.components.DrawingDimension;
@@ -19,6 +22,7 @@ import com.amverhagen.tube.tubes.Tube.Direction;
 import com.amverhagen.tube.tubes.Tube.Type;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.DrawingSystem;
+import com.amverhagen.tube.systems.MoveEntityAroundCourse;
 import com.amverhagen.tube.systems.MoveInAngleDirectionSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.amverhagen.tube.systems.RenderBoxSystem;
@@ -41,6 +45,7 @@ public class MainMenuScreen implements Screen {
 	Entity playButton;
 	Entity optionsButton;
 	Entity ball;
+	LinkedListQueue<Vector2> course;
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
@@ -55,14 +60,17 @@ public class MainMenuScreen implements Screen {
 		worldConfig.setSystem(new UiClickSystem(game.uiCamera));
 		worldConfig.setSystem(MoveInAngleDirectionSystem.class);
 		worldConfig.setSystem(MoveInDirectionSystem.class);
+		worldConfig.setSystem(MoveEntityAroundCourse.class);
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
 		worldConfig.setSystem(new RenderUISystem(game.uiBatch, game.uiCamera));
 		worldConfig.setSystem(new RenderBoxSystem(game.shapeRenderer));
+		worldConfig.setSystem(CameraFocusSystem.class);
 		world = new World(worldConfig);
 	}
 
 	public void createTrail() {
-		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(100, new Vector2(0, 0));
+		course = new LinkedListQueue<Vector2>();
+		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(10, new Vector2(0, 0));
 		for (Tube t : tubes) {
 			this.addTubeToWorld(t);
 		}
@@ -76,9 +84,9 @@ public class MainMenuScreen implements Screen {
 	}
 
 	public void createBall() {
-		ball = new EntityBuilder(world).with(new Position(0, 0), new DrawingDimension(.5f, .5f),
-				new Drawable(new Texture(Gdx.files.internal("green_circle.png"))),
-				new MovementDirection(MovementDirection.Direction.EAST), new MovementSpeed(1f)).build();
+		ball = new EntityBuilder(world).with(new Position(course.dequeue()), new DrawingDimension(.5f, .5f),
+				new CameraFocus(game.gameCamera), new Drawable(new Texture(Gdx.files.internal("green_circle.png"))),
+				new MovementSpeed(4f), new Course(course)).build();
 	}
 
 	public void addTubeToWorld(Tube t) {
@@ -87,7 +95,9 @@ public class MainMenuScreen implements Screen {
 		Drawable dc = new Drawable(new Texture(Gdx.files.internal("black.png")));
 		Position pc = new Position(t.getPosition());
 		DrawingDimension ddc = new DrawingDimension(t.getBounds());
-		tube.edit().add(dc).add(pc).add(ddc).add(dlac);
+		Center cc = new Center(new Vector2(pc.x, pc.y), new Vector2(ddc.width, ddc.height));
+		course.enqueue(cc.center);
+		tube.edit().add(dc).add(pc).add(ddc).add(dlac).add(cc);
 	}
 
 	public Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body) {
@@ -116,18 +126,6 @@ public class MainMenuScreen implements Screen {
 		game.uiCamera.update();
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
-		if (Gdx.input.isKeyPressed(Keys.UP)) {
-			game.gameCamera.position.y += 1f * delta;
-		}
-		if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-			game.gameCamera.position.y -= 1f * delta;
-		}
-		if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-			game.gameCamera.position.x += 1f * delta;
-		}
-		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-			game.gameCamera.position.x -= 1f * delta;
-		}
 		world.setDelta(delta);
 		world.process();
 	}

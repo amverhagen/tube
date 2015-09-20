@@ -13,8 +13,6 @@ public class CameraFocusSystem extends com.artemis.systems.EntityProcessingSyste
 	ComponentMapper<CameraFocus> cameraMapper;
 	@Wire
 	ComponentMapper<Position> positionMapper;
-	@Wire
-	ComponentMapper<DrawingDimension> bodyMapper;
 
 	@SuppressWarnings("unchecked")
 	public CameraFocusSystem() {
@@ -25,10 +23,7 @@ public class CameraFocusSystem extends com.artemis.systems.EntityProcessingSyste
 	protected void process(Entity e) {
 		CameraFocus cameraComp = cameraMapper.get(e);
 		Position positionComp = positionMapper.get(e);
-		DrawingDimension bodyComp = bodyMapper.get(e);
-		float x = positionComp.x + (bodyComp.width / 2);
-		float y = positionComp.y + (bodyComp.height / 2);
-		cameraComp.camera.position.set(x, y, 0);
+		cameraComp.camera.position.set(positionComp.x, positionComp.y, 0);
 		cameraComp.camera.update();
 	}
 

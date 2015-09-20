@@ -21,7 +21,13 @@ public class ConnectedTubeMaker {
 	private static boolean addTubeUntilSizeReached(Stack<Tube> tubes, int size) {
 		if (tubes.size() >= size)
 			return true;
-		ArrayList<Type> types = Type.getTypeList();
+		ArrayList<Type> types = new ArrayList<Type>();
+		if (tubes.peek().getType() == Type.SHORT) {
+			types = Type.getTurnList();
+		} else {
+			types = Type.getStraightList();
+		}
+
 		while (types.size() > 0) {
 			Type type = types.remove((int) (Math.random() * types.size()));
 			Tube tube = new Tube(tubes.peek(), type);
