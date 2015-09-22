@@ -10,6 +10,8 @@ import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.tween.SpriteAccessor;
 import com.amverhagen.tube.systems.DrawingSystem;
 import com.amverhagen.tube.systems.RenderUISystem;
+import com.amverhagen.tube.systems.ScreenState;
+import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
@@ -20,19 +22,23 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
+import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 
 public class MainMenuScreen implements Screen {
 	private TweenManager tweenManager;
 	private Sprite black;
-	TubeGame game;
+	private TubeGame game;
+	private ScreenState state;
 	World world;
 	Entity title;
 	Entity playButton;
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
+		state = new ScreenState(State.LOADING);
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		createWorld();
@@ -44,7 +50,7 @@ public class MainMenuScreen implements Screen {
 
 	public void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
-		worldConfig.setSystem(new UiClickSystem(game.uiCamera));
+		worldConfig.setSystem(new UiClickSystem(game.uiCamera, state));
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
 		worldConfig.setSystem(new RenderUISystem(game.uiBatch, game.uiCamera));
 		world = new World(worldConfig);
@@ -79,13 +85,18 @@ public class MainMenuScreen implements Screen {
 	}
 
 	public void createBackground() {
-		black = new Sprite(new Texture(Gdx.files.internal("black.png")));
+		black = new Sprite(game.assManager.get("black.png", Texture.class));
 		black.setSize(100, 100);
 	}
 
 	@Override
 	public void show() {
-		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager);
+		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager).setCallback(new TweenCallback() {
+			@Override
+			public void onEvent(int arg0, BaseTween<?> arg1) {
+				state.state = State.RUNNING;
+			}
+		});
 	}
 
 	@Override

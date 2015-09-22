@@ -3,6 +3,7 @@ package com.amverhagen.tube.systems;
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityPos;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
+import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
@@ -13,18 +14,22 @@ public class AddConnectedPointsFromEntityPosSystem extends com.artemis.systems.E
 	ComponentMapper<RecordConnectedPoints> recordedPointsMapper;
 	@Wire
 	ComponentMapper<Position> positionMapper;
+	private State state;
 
 	@SuppressWarnings("unchecked")
-	public AddConnectedPointsFromEntityPosSystem() {
+	public AddConnectedPointsFromEntityPosSystem(State state) {
 		super(Aspect.all(AddConnectedPointsFromEntityPos.class, RecordConnectedPoints.class, Position.class));
+		this.state = state;
 	}
 
 	@Override
 	protected void process(Entity e) {
-		RecordConnectedPoints recordedPointsComp = recordedPointsMapper.get(e);
-		Position positionComp = positionMapper.get(e);
+		if (state == State.RUNNING) {
+			RecordConnectedPoints recordedPointsComp = recordedPointsMapper.get(e);
+			Position positionComp = positionMapper.get(e);
 
-		recordedPointsComp.points.addPoint(positionComp.x, positionComp.y);
+			recordedPointsComp.points.addPoint(positionComp.x, positionComp.y);
+		}
 	}
 
 }

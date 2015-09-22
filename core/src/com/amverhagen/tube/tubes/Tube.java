@@ -65,6 +65,10 @@ public class Tube {
 		return this.bounds;
 	}
 
+	public Vector2 getCenter() {
+		return new Vector2(position.x + (bounds.x / 2), position.y + (bounds.y / 2));
+	}
+
 	public Direction getDirection() {
 		return this.direction;
 	}
