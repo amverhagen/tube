@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class TubeGame extends Game {
 	public final static int GAME_WIDTH = 160000;
@@ -19,8 +18,8 @@ public class TubeGame extends Game {
 	public Camera gameCamera;
 	public SpriteBatch uiBatch;
 	public Camera uiCamera;
-	public Viewport viewport;
-	public Viewport uiViewport;
+	public FitViewport viewport;
+	public FitViewport uiViewport;
 	private MainMenuScreen menuScreen;
 	private GameScreen gameScreen;
 
@@ -47,7 +46,15 @@ public class TubeGame extends Game {
 		shapeRenderer.setAutoShapeType(true);
 		menuScreen = new MainMenuScreen(this);
 		gameScreen = new GameScreen(this);
+		this.setToMenuScreen();
+	}
+
+	public void setToMenuScreen() {
 		this.setScreen(menuScreen);
+	}
+
+	public void setToGameScreen() {
+		this.setScreen(gameScreen);
 	}
 
 	@Override

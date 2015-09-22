@@ -13,9 +13,11 @@ import com.badlogic.gdx.math.Vector3;
 
 public class UiClickSystem extends com.artemis.systems.EntityProcessingSystem {
 	@Wire
-	ComponentMapper<DrawingDimension> dimensionWrapper;
+	ComponentMapper<DrawingDimension> dimensionMapper;
 	@Wire
-	ComponentMapper<Position> positionWrapper;
+	ComponentMapper<Position> positionMapper;
+	@Wire
+	ComponentMapper<Clickable> clickMapper;
 	private Camera camera;
 	private Vector3 unprojected;
 
@@ -36,11 +38,12 @@ public class UiClickSystem extends com.artemis.systems.EntityProcessingSystem {
 	@Override
 	protected void process(Entity e) {
 		if (Gdx.input.justTouched()) {
-			DrawingDimension drawComp = dimensionWrapper.get(e);
-			Position pos = positionWrapper.get(e);
+			DrawingDimension drawComp = dimensionMapper.get(e);
+			Position pos = positionMapper.get(e);
+			Clickable clickComp = clickMapper.get(e);
 			if ((unprojected.x >= pos.x) && (unprojected.x <= (pos.x + drawComp.width)) && (unprojected.y >= pos.y)
 					&& (unprojected.y <= (pos.y + drawComp.height))) {
-				System.out.println("Touched");
+				clickComp.event.action();
 			}
 		}
 	}
