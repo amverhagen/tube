@@ -6,7 +6,7 @@ import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
 import com.amverhagen.tube.components.DrawingDimension;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
-import com.amverhagen.tube.components.DrawLineAroundBody;
+import com.amverhagen.tube.components.CollidableEntity;
 import com.amverhagen.tube.components.Drawable;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
@@ -14,9 +14,11 @@ import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderConnectedPoints;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
+import com.amverhagen.tube.components.CollidableEntity.CollisionType;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
+import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DrawingSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.amverhagen.tube.systems.RenderConnectedPointsSystem;
@@ -30,6 +32,7 @@ import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
+import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -65,15 +68,16 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(ShiftDirectionLeftOrRightByPressSystem.class);
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
 		worldConfig.setSystem(CameraFocusSystem.class);
+		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
+		worldConfig.setManager(new TagManager());
 
 		world = new World(worldConfig);
 		createPipes();
 		addPlayer();
-
 	}
 
 	private void createPipes() {
-		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(100, new Vector2(0, 0));
+		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(20, new Vector2(0, 0));
 		startPos = tubes.get(0).getCenter();
 		for (Tube t : tubes) {
 			this.addTubeToWorld(t);
@@ -95,17 +99,30 @@ public class GameScreen implements Screen {
 		RenderConnectedPoints renderPointsComp = new RenderConnectedPoints(Color.BLUE, .05f);
 		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress(
 				game.gameCamera);
+		CollidableEntity crc = new CollidableEntity(drawDimension.width, drawDimension.height, CollisionType.PLAYER);
 		player.edit().add(position).add(drawDimension).add(center).add(cameraFocus).add(drawComp).add(speedComp)
-				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp);
+				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp)
+				.add(crc);
+		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
 	public void addTubeToWorld(Tube t) {
 		Entity tube = world.createEntity();
-		DrawLineAroundBody dlac = new DrawLineAroundBody();
 		Drawable dc = new Drawable(game.assManager.get("black.png", Texture.class));
 		Position pc = new Position(t.getPosition());
 		DrawingDimension ddc = new DrawingDimension(t.getBounds());
-		tube.edit().add(dc).add(pc).add(ddc).add(dlac);
+		Center center = new Center(pc, ddc);
+		tube.edit().add(dc).add(pc).add(ddc);
+		createCollidableCenterAt(center.center);
+	}
+
+	public void createCollidableCenterAt(Vector2 center) {
+		Entity tubeCenter = world.createEntity();
+		Drawable dc = new Drawable(new Texture(Gdx.files.internal("green_blurb.png")));
+		DrawingDimension ddc = new DrawingDimension(.25f, .25f);
+		Position pc = new Position(center.x - (ddc.width / 2), center.y - (ddc.height / 2));
+		CollidableEntity crc = new CollidableEntity(ddc.width, ddc.height, CollisionType.ORB);
+		tubeCenter.edit().add(dc).add(ddc).add(pc).add(crc);
 	}
 
 	@Override

@@ -1,8 +1,9 @@
 package com.amverhagen.tube.collections;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
-public class LinkedListQueue<T> implements Queue<T> {
+public class LinkedListQueue<T> implements Queue<T>, Iterable<T> {
 
 	private LinkedList<T> elements;
 
@@ -36,6 +37,11 @@ public class LinkedListQueue<T> implements Queue<T> {
 	@Override
 	public int size() {
 		return elements.size();
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return null;
 	}
 
 }
