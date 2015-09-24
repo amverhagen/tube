@@ -1,9 +1,8 @@
 package com.amverhagen.tube.screens;
 
-import java.util.ArrayList;
-
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
 import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.ForeGround;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.CollidableEntity;
@@ -16,18 +15,18 @@ import com.amverhagen.tube.components.RenderConnectedPoints;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.CollidableEntity.CollisionType;
 import com.amverhagen.tube.game.TubeGame;
+import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DrawingSystem;
+import com.amverhagen.tube.systems.ForeGroundSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.amverhagen.tube.systems.RenderConnectedPointsSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
 import com.amverhagen.tube.systems.UpdateCenterSystem;
-import com.amverhagen.tube.tubes.ConnectedTubeMaker;
-import com.amverhagen.tube.tubes.Tube;
 import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
@@ -54,14 +53,17 @@ public class GameScreen implements Screen {
 	private World world;
 	private Entity player;
 	private Vector2 startPos;
+	private TubeManager tubeManager;
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
 		this.gameState = new ScreenState(State.LOADING);
+		this.tubeManager = new TubeManager(this.game);
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
+		worldConfig.setSystem(new ForeGroundSystem(game.gameBatch));
 		worldConfig.setSystem(new RenderConnectedPointsSystem(game.shapeRenderer));
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
@@ -70,29 +72,24 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
 		worldConfig.setManager(new TagManager());
+		worldConfig.setManager(tubeManager);
 
 		world = new World(worldConfig);
-		createPipes();
 		addPlayer();
-	}
-
-	private void createPipes() {
-		ArrayList<Tube> tubes = ConnectedTubeMaker.makeConnectedTubes(20, new Vector2(0, 0));
-		startPos = tubes.get(0).getCenter();
-		for (Tube t : tubes) {
-			this.addTubeToWorld(t);
-		}
 	}
 
 	private void addPlayer() {
 		player = world.createEntity();
 		DrawingDimension drawDimension = new DrawingDimension(.5f, .5f);
-		Position position = new Position(startPos.x - (drawDimension.width / 2),
-				startPos.y - (drawDimension.height / 2));
+		// Position position = new Position(startPos.x - (drawDimension.width /
+		// 2),
+		// startPos.y - (drawDimension.height / 2));
+		ForeGround fg = new ForeGround();
+		Position position = new Position(0, 0);
 		Center center = new Center(position, drawDimension);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
 		Drawable drawComp = new Drawable(new Texture(Gdx.files.internal("green_circle.png")));
-		MovementSpeed speedComp = new MovementSpeed(6f);
+		MovementSpeed speedComp = new MovementSpeed(8f);
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
 		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
@@ -100,29 +97,10 @@ public class GameScreen implements Screen {
 		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress(
 				game.gameCamera);
 		CollidableEntity crc = new CollidableEntity(drawDimension.width, drawDimension.height, CollisionType.PLAYER);
-		player.edit().add(position).add(drawDimension).add(center).add(cameraFocus).add(drawComp).add(speedComp)
+		player.edit().add(fg).add(position).add(drawDimension).add(center).add(cameraFocus).add(drawComp).add(speedComp)
 				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp)
 				.add(crc);
 		world.getManager(TagManager.class).register("PLAYER", player);
-	}
-
-	public void addTubeToWorld(Tube t) {
-		Entity tube = world.createEntity();
-		Drawable dc = new Drawable(game.assManager.get("black.png", Texture.class));
-		Position pc = new Position(t.getPosition());
-		DrawingDimension ddc = new DrawingDimension(t.getBounds());
-		Center center = new Center(pc, ddc);
-		tube.edit().add(dc).add(pc).add(ddc);
-		createCollidableCenterAt(center.center);
-	}
-
-	public void createCollidableCenterAt(Vector2 center) {
-		Entity tubeCenter = world.createEntity();
-		Drawable dc = new Drawable(new Texture(Gdx.files.internal("green_blurb.png")));
-		DrawingDimension ddc = new DrawingDimension(.25f, .25f);
-		Position pc = new Position(center.x - (ddc.width / 2), center.y - (ddc.height / 2));
-		CollidableEntity crc = new CollidableEntity(ddc.width, ddc.height, CollisionType.ORB);
-		tubeCenter.edit().add(dc).add(ddc).add(pc).add(crc);
 	}
 
 	@Override
@@ -130,6 +108,9 @@ public class GameScreen implements Screen {
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
 		black.setPosition(-50, -50);
 		black.setSize(100, 100);
+		tubeManager.addTube();
+		tubeManager.addTube();
+		tubeManager.addTube();
 
 		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
@@ -141,7 +122,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(1, 1, 1f, 1);
+		Gdx.gl.glClearColor(0, 0, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);

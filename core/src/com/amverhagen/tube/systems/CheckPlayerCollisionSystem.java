@@ -2,6 +2,7 @@ package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.CollidableEntity;
 import com.amverhagen.tube.components.CollidableEntity.CollisionType;
+import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Aspect;
@@ -46,6 +47,7 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 						&& (playerPos.y) < (posComp.y + collisionComp.height)) {
 					if (collisionComp.type == CollisionType.ORB) {
 						e.deleteFromWorld();
+						world.getManager(TubeManager.class).addTube();
 					}
 					// new EntityBuilder(world).with(new Position(centerX,
 					// centerY),

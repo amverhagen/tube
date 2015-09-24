@@ -58,6 +58,7 @@ public class TubeGame extends Game {
 	private void loadAssets() {
 		assManager = new AssetManager();
 		assManager.load("black.png", Texture.class);
+		assManager.load("white.png", Texture.class);
 		assManager.finishLoading();
 	}
 

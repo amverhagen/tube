@@ -2,6 +2,13 @@ package com.amverhagen.tube.tubes;
 
 import java.util.ArrayList;
 
+//import com.amverhagen.tube.components.Center;
+import com.amverhagen.tube.components.Drawable;
+import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.Position;
+import com.artemis.Entity;
+import com.artemis.World;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 public class Tube {
@@ -14,7 +21,7 @@ public class Tube {
 		this.position = position;
 		this.type = type;
 		this.direction = direction;
-		this.setBoundsByTypeAndDirection();
+		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
 	}
 
 	public Tube(Tube oldTube, Type type) {
@@ -26,23 +33,44 @@ public class Tube {
 		} else {
 			this.direction = oldTube.direction;
 		}
-		this.setBoundsByTypeAndDirection();
+		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
 		this.setPositionFromConnectingTube(oldTube);
 	}
 
-	private void setBoundsByTypeAndDirection() {
+	public Tube(Tube oldTube) {
+		if (oldTube.type == Type.SHORT) {
+			this.type = Type.createRandomTurn();
+		} else {
+			this.type = Type.SHORT;
+		}
+		this.direction = getDirectionFromTypeAndPreviousTube(oldTube, this.type);
+		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
+		this.setPositionFromConnectingTube(oldTube);
+	}
+
+	private Direction getDirectionFromTypeAndPreviousTube(Tube oldTube, Type type) {
+		if (type == Type.COUNTER) {
+			return Direction.counterDirection(oldTube.direction);
+		} else if (type == Type.CLOCK) {
+			return Direction.clockDirection(oldTube.direction);
+		} else {
+			return oldTube.direction;
+		}
+	}
+
+	private Vector2 getBoundsByTypeAndDirection(Type type, Direction direction) {
 		switch (type) {
 		case SHORT:
 			if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-				this.bounds = new Vector2(1, 3);
+				return new Vector2(2, 6);
 			} else if (direction == Direction.EAST || direction == Direction.WEST) {
-				this.bounds = new Vector2(3, 1);
+				return new Vector2(6, 2);
 			}
 			break;
 		default:
-			this.bounds = new Vector2(1, 1);
-			break;
+			return new Vector2(2, 2);
 		}
+		return new Vector2(1, 1);
 	}
 
 	private void setPositionFromConnectingTube(Tube connectingTube) {
@@ -55,6 +83,16 @@ public class Tube {
 		} else if (connectingTube.direction == Direction.WEST) {
 			this.position = new Vector2(connectingTube.position.x - this.bounds.x, connectingTube.position.y);
 		}
+	}
+
+	public Entity returnAsEntity(World world, Texture texture) {
+		Entity tube = world.createEntity();
+		Drawable dc = new Drawable(texture);
+		Position pc = new Position(this.position);
+		DrawingDimension ddc = new DrawingDimension(this.bounds);
+		// Center center = new Center(pc, ddc);
+		tube.edit().add(dc).add(pc).add(ddc);
+		return tube;
 	}
 
 	public Vector2 getPosition() {
@@ -114,6 +152,14 @@ public class Tube {
 			types.add(COUNTER);
 			types.add(CLOCK);
 			return types;
+		}
+
+		public static Type createRandomTurn() {
+			if (Math.random() < .5) {
+				return Type.COUNTER;
+			} else {
+				return Type.CLOCK;
+			}
 		}
 
 		public static ArrayList<Type> getStraightList() {
