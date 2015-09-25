@@ -2,7 +2,7 @@ package com.amverhagen.tube.screens;
 
 import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.Clickable.Event;
-import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.UIRenderable;
 import com.amverhagen.tube.game.TubeGame;
@@ -59,8 +59,8 @@ public class MainMenuScreen implements Screen {
 	public void createTitle() {
 		title = world.createEntity();
 		Position pc = new Position(4f, 4f);
-		DrawingDimension ddc = new DrawingDimension(2f, 1f);
-		UIRenderable dc = new UIRenderable(new Texture(Gdx.files.internal("tube_title.png")));
+		RenderBody ddc = new RenderBody(2f, 1f);
+		UIRenderable dc = new UIRenderable(game.assManager.get("tube_title.png", Texture.class));
 		title.edit().add(pc).add(ddc).add(dc);
 	}
 
@@ -78,7 +78,7 @@ public class MainMenuScreen implements Screen {
 		Entity e = world.createEntity();
 		UIRenderable uic = new UIRenderable(texture);
 		Position pc = new Position(pos);
-		DrawingDimension ddc = new DrawingDimension(body);
+		RenderBody ddc = new RenderBody(body);
 		Clickable cc = new Clickable(event);
 		e.edit().add(uic).add(pc).add(ddc).add(cc);
 		return e;

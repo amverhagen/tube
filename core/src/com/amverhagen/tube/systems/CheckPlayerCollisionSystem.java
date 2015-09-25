@@ -1,7 +1,9 @@
 package com.amverhagen.tube.systems;
 
-import com.amverhagen.tube.components.CollidableEntity;
-import com.amverhagen.tube.components.CollidableEntity.CollisionType;
+import com.amverhagen.tube.components.CollidableComponent;
+import com.amverhagen.tube.components.PhysicsBody;
+import com.amverhagen.tube.components.CollidableComponent.CollisionType;
+import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.systems.ScreenState.State;
@@ -13,18 +15,22 @@ import com.artemis.managers.TagManager;
 
 public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProcessingSystem {
 	@Wire
-	ComponentMapper<CollidableEntity> collisionMapper;
+	ComponentMapper<CollidableComponent> collisionMapper;
+	@Wire
+	ComponentMapper<PhysicsBody> physicsBodyMapper;
 	@Wire
 	ComponentMapper<Position> positionMapper;
+	@Wire
+	ComponentMapper<Deletable> deleteMapper;
 
 	private Entity player;
 	private Position playerPos;
-	private CollidableEntity playerBounds;
+	private PhysicsBody playerBounds;
 	private ScreenState state;
 
 	@SuppressWarnings("unchecked")
 	public CheckPlayerCollisionSystem(ScreenState state) {
-		super(Aspect.all(CollidableEntity.class, Position.class));
+		super(Aspect.all(CollidableComponent.class, PhysicsBody.class, Position.class));
 		this.state = state;
 	}
 
@@ -32,31 +38,36 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 	protected void begin() {
 		player = world.getManager(TagManager.class).getEntity("PLAYER");
 		playerPos = player.getComponent(Position.class);
-		playerBounds = player.getComponent(CollidableEntity.class);
+		playerBounds = player.getComponent(PhysicsBody.class);
 	}
 
 	@Override
 	protected void process(Entity e) {
 		if (state.state == State.RUNNING) {
-			CollidableEntity collisionComp = collisionMapper.get(e);
-			if (collisionComp.type != CollisionType.PLAYER) {
-				Position posComp = positionMapper.get(e);
-				if ((playerPos.x + playerBounds.width) > (posComp.x)
-						&& (playerPos.x) < (posComp.x + collisionComp.width)
-						&& (playerPos.y + playerBounds.height) > (posComp.y)
-						&& (playerPos.y) < (posComp.y + collisionComp.height)) {
-					if (collisionComp.type == CollisionType.ORB) {
-						e.deleteFromWorld();
-						world.getManager(TubeManager.class).addTube();
-					}
-					// new EntityBuilder(world).with(new Position(centerX,
-					// centerY),
-					// new RenderConnectedPoints(Color.BLACK, .05f), new
-					// RecordConnectedPoints(20),
-					// new MovementSpeed(5f), new AngleDirection(1f), new
-					// AddConnectedPointsFromEntityPos()).build();
+			CollidableComponent cc = collisionMapper.get(e);
+			if (cc.type != CollisionType.PLAYER) {
+				Position pos = positionMapper.get(e);
+				PhysicsBody body = physicsBodyMapper.get(e);
+				if ((playerPos.x + playerBounds.width) > (pos.x) && (playerPos.x) < (pos.x + body.width)
+						&& (playerPos.y + playerBounds.height) > (pos.y) && (playerPos.y) < (pos.y + body.height)) {
+					handleCollision(cc.type, e);
 				}
 			}
 		}
 	}
+
+	private void handleCollision(CollidableComponent.CollisionType ct, Entity e) {
+		if (ct == CollisionType.ORB) {
+			Deletable d = deleteMapper.get(e);
+			d.needsDeleted = true;
+			world.getManager(TubeManager.class).addTube();
+		} else if (ct == CollisionType.WALL) {
+		}
+	}
 }
+// new EntityBuilder(world).with(new Position(centerX,
+// centerY),
+// new RenderConnectedPoints(Color.BLACK, .05f), new
+// RecordConnectedPoints(20),
+// new MovementSpeed(5f), new AngleDirection(1f), new
+// AddConnectedPointsFromEntityPos()).build();

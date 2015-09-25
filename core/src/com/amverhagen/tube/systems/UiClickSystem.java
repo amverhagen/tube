@@ -1,7 +1,7 @@
 package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.Clickable;
-import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Aspect;
@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class UiClickSystem extends com.artemis.systems.EntityProcessingSystem {
 	@Wire
-	ComponentMapper<DrawingDimension> dimensionMapper;
+	ComponentMapper<RenderBody> dimensionMapper;
 	@Wire
 	ComponentMapper<Position> positionMapper;
 	@Wire
@@ -25,7 +25,7 @@ public class UiClickSystem extends com.artemis.systems.EntityProcessingSystem {
 
 	@SuppressWarnings("unchecked")
 	public UiClickSystem(Camera camera, ScreenState state) {
-		super(Aspect.all(Clickable.class, DrawingDimension.class, Position.class));
+		super(Aspect.all(Clickable.class, RenderBody.class, Position.class));
 		this.camera = camera;
 		unprojected = new Vector3(0, 0, 0);
 		this.state = state;
@@ -42,7 +42,7 @@ public class UiClickSystem extends com.artemis.systems.EntityProcessingSystem {
 	protected void process(Entity e) {
 		if (state.state == State.RUNNING) {
 			if (Gdx.input.justTouched()) {
-				DrawingDimension drawComp = dimensionMapper.get(e);
+				RenderBody drawComp = dimensionMapper.get(e);
 				Position pos = positionMapper.get(e);
 				Clickable clickComp = clickMapper.get(e);
 				if ((unprojected.x >= pos.x) && (unprojected.x <= (pos.x + drawComp.width)) && (unprojected.y >= pos.y)

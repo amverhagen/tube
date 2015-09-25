@@ -1,7 +1,7 @@
 package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.DrawLineAroundBody;
-import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -16,11 +16,11 @@ public class RenderBoxSystem extends com.artemis.systems.EntityProcessingSystem 
 	@Wire
 	ComponentMapper<Position> positionMapper;
 	@Wire
-	ComponentMapper<DrawingDimension> dimensionMapper;
+	ComponentMapper<RenderBody> dimensionMapper;
 
 	@SuppressWarnings("unchecked")
 	public RenderBoxSystem(ShapeRenderer renderer) {
-		super(Aspect.all(DrawLineAroundBody.class, Position.class, DrawingDimension.class));
+		super(Aspect.all(DrawLineAroundBody.class, Position.class, RenderBody.class));
 		this.renderer = renderer;
 	}
 
@@ -33,7 +33,7 @@ public class RenderBoxSystem extends com.artemis.systems.EntityProcessingSystem 
 	@Override
 	protected void process(Entity e) {
 		Position pos = positionMapper.get(e);
-		DrawingDimension dim = dimensionMapper.get(e);
+		RenderBody dim = dimensionMapper.get(e);
 		renderer.rect(pos.x, pos.y, dim.width, dim.height);
 	}
 

@@ -4,10 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Center extends com.artemis.Component {
 	public Position position;
-	public DrawingDimension body;
+	public RenderBody body;
 	public Vector2 center;
 
-	public Center(Position pos, DrawingDimension body) {
+	public Center(Position pos, RenderBody body) {
 		center = new Vector2();
 		position = pos;
 		this.body = body;

@@ -2,9 +2,9 @@ package com.amverhagen.tube.tubes;
 
 import java.util.ArrayList;
 
-//import com.amverhagen.tube.components.Center;
-import com.amverhagen.tube.components.Drawable;
-import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.Renderable;
+import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Entity;
 import com.artemis.World;
@@ -22,19 +22,6 @@ public class Tube {
 		this.type = type;
 		this.direction = direction;
 		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
-	}
-
-	public Tube(Tube oldTube, Type type) {
-		this.type = type;
-		if (type == Type.COUNTER) {
-			this.direction = Direction.counterDirection(oldTube.direction);
-		} else if (type == Type.CLOCK) {
-			this.direction = Direction.clockDirection(oldTube.direction);
-		} else {
-			this.direction = oldTube.direction;
-		}
-		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
-		this.setPositionFromConnectingTube(oldTube);
 	}
 
 	public Tube(Tube oldTube) {
@@ -87,11 +74,11 @@ public class Tube {
 
 	public Entity returnAsEntity(World world, Texture texture) {
 		Entity tube = world.createEntity();
-		Drawable dc = new Drawable(texture);
+		Renderable renderable = new Renderable(texture);
 		Position pc = new Position(this.position);
-		DrawingDimension ddc = new DrawingDimension(this.bounds);
-		// Center center = new Center(pc, ddc);
-		tube.edit().add(dc).add(pc).add(ddc);
+		RenderBody ddc = new RenderBody(this.bounds);
+		Deletable dc = new Deletable(false);
+		tube.edit().add(renderable).add(dc).add(pc).add(ddc);
 		return tube;
 	}
 

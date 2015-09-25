@@ -1,9 +1,11 @@
 package com.amverhagen.tube.managers;
 
 import com.amverhagen.tube.collections.LinkedListQueue;
-import com.amverhagen.tube.components.CollidableEntity;
+import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.components.CollidableEntity.CollisionType;
+import com.amverhagen.tube.components.CollidableComponent.CollisionType;
+import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.tubes.Tube.Direction;
 import com.amverhagen.tube.tubes.Tube;
@@ -20,7 +22,6 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 	public TubeManager(TubeGame game) {
 		this.game = game;
 		activeTubes = new LinkedListQueue<Entity>();
-
 	}
 
 	public void addTube() {
@@ -42,8 +43,10 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 
 	private void createCollidableCenterAt(Vector2 center) {
 		Entity tubeCenter = world.createEntity();
-		CollidableEntity crc = new CollidableEntity(2f, 2f, CollisionType.ORB);
-		Position pc = new Position(center.x - (crc.width / 2), center.y - (crc.height / 2));
-		tubeCenter.edit().add(pc).add(crc);
+		PhysicsBody body = new PhysicsBody(2f, 2f);
+		Position pos = new Position(center.x - (body.width / 2), center.y - (body.height / 2));
+		CollidableComponent crc = new CollidableComponent(CollisionType.ORB);
+		Deletable dc = new Deletable(false);
+		tubeCenter.edit().add(body).add(pos).add(crc).add(dc);
 	}
 }

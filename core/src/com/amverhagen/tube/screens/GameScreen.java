@@ -1,24 +1,27 @@
 package com.amverhagen.tube.screens;
 
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
-import com.amverhagen.tube.components.DrawingDimension;
+import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.ForeGround;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
-import com.amverhagen.tube.components.CollidableEntity;
-import com.amverhagen.tube.components.Drawable;
+import com.amverhagen.tube.components.CollidableComponent;
+import com.amverhagen.tube.components.Renderable;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
+import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderConnectedPoints;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
-import com.amverhagen.tube.components.CollidableEntity.CollisionType;
+import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
+import com.amverhagen.tube.systems.DeleteChildEntitySystem;
+import com.amverhagen.tube.systems.DeleteEntitySystem;
 import com.amverhagen.tube.systems.DrawingSystem;
 import com.amverhagen.tube.systems.ForeGroundSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
@@ -38,7 +41,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
@@ -52,14 +54,13 @@ public class GameScreen implements Screen {
 	private TubeGame game;
 	private World world;
 	private Entity player;
-	private Vector2 startPos;
 	private TubeManager tubeManager;
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
 		this.gameState = new ScreenState(State.LOADING);
 		this.tubeManager = new TubeManager(this.game);
-		tweenManager = new TweenManager();
+		this.tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
@@ -71,6 +72,8 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
 		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
+		worldConfig.setSystem(DeleteChildEntitySystem.class);
+		worldConfig.setSystem(DeleteEntitySystem.class);
 		worldConfig.setManager(new TagManager());
 		worldConfig.setManager(tubeManager);
 
@@ -80,15 +83,13 @@ public class GameScreen implements Screen {
 
 	private void addPlayer() {
 		player = world.createEntity();
-		DrawingDimension drawDimension = new DrawingDimension(.5f, .5f);
-		// Position position = new Position(startPos.x - (drawDimension.width /
-		// 2),
-		// startPos.y - (drawDimension.height / 2));
+		RenderBody renderBody = new RenderBody(.5f, .5f);
+		PhysicsBody physicsBody = new PhysicsBody(.5f, .5f);
 		ForeGround fg = new ForeGround();
-		Position position = new Position(0, 0);
-		Center center = new Center(position, drawDimension);
+		Position position = new Position(1, 1);
+		Center center = new Center(position, renderBody);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
-		Drawable drawComp = new Drawable(new Texture(Gdx.files.internal("green_circle.png")));
+		Renderable drawComp = new Renderable(new Texture(Gdx.files.internal("green_circle.png")));
 		MovementSpeed speedComp = new MovementSpeed(8f);
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
@@ -96,10 +97,10 @@ public class GameScreen implements Screen {
 		RenderConnectedPoints renderPointsComp = new RenderConnectedPoints(Color.BLUE, .05f);
 		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress(
 				game.gameCamera);
-		CollidableEntity crc = new CollidableEntity(drawDimension.width, drawDimension.height, CollisionType.PLAYER);
-		player.edit().add(fg).add(position).add(drawDimension).add(center).add(cameraFocus).add(drawComp).add(speedComp)
-				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp)
-				.add(crc);
+		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
+		player.edit().add(physicsBody).add(fg).add(position).add(renderBody).add(center).add(cameraFocus).add(drawComp)
+				.add(speedComp).add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp)
+				.add(setDirectionComp).add(crc);
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
@@ -108,6 +109,7 @@ public class GameScreen implements Screen {
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
 		black.setPosition(-50, -50);
 		black.setSize(100, 100);
+		tubeManager.addTube();
 		tubeManager.addTube();
 		tubeManager.addTube();
 		tubeManager.addTube();
