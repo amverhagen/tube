@@ -4,10 +4,15 @@ import java.util.ArrayList;
 
 import com.amverhagen.tube.components.Renderable;
 import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.CollidableComponent;
+import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.HasParent;
+import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Entity;
 import com.artemis.World;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,6 +20,7 @@ public class Tube {
 	private Vector2 position;
 	private Vector2 bounds;
 	private Type type;
+	private ArrayList<Direction> boundingWalls;
 	private Direction direction;
 
 	public Tube(Vector2 position, Type type, Direction direction) {
@@ -22,6 +28,7 @@ public class Tube {
 		this.type = type;
 		this.direction = direction;
 		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
+		this.setBoundingWalls();
 	}
 
 	public Tube(Tube oldTube) {
@@ -33,6 +40,7 @@ public class Tube {
 		this.direction = getDirectionFromTypeAndPreviousTube(oldTube, this.type);
 		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
 		this.setPositionFromConnectingTube(oldTube);
+		this.setBoundingWalls();
 	}
 
 	private Direction getDirectionFromTypeAndPreviousTube(Tube oldTube, Type type) {
@@ -49,13 +57,13 @@ public class Tube {
 		switch (type) {
 		case SHORT:
 			if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-				return new Vector2(2, 6);
+				return new Vector2(1.25f, 6);
 			} else if (direction == Direction.EAST || direction == Direction.WEST) {
-				return new Vector2(6, 2);
+				return new Vector2(6, 1.25f);
 			}
 			break;
 		default:
-			return new Vector2(2, 2);
+			return new Vector2(1.25f, 1.25f);
 		}
 		return new Vector2(1, 1);
 	}
@@ -72,6 +80,40 @@ public class Tube {
 		}
 	}
 
+	private void setBoundingWalls() {
+		boundingWalls = new ArrayList<Tube.Direction>();
+		if (this.type == Type.SHORT) {
+			if (this.direction == Direction.NORTH || this.direction == Direction.SOUTH) {
+				boundingWalls.add(Direction.EAST);
+				boundingWalls.add(Direction.WEST);
+			} else {
+				boundingWalls.add(Direction.NORTH);
+				boundingWalls.add(Direction.SOUTH);
+			}
+		} else {
+			if ((this.type == Type.COUNTER && this.direction == Direction.EAST)
+					|| (this.type == Type.CLOCK && this.direction == Direction.NORTH)) {
+				boundingWalls.add(Direction.WEST);
+				boundingWalls.add(Direction.SOUTH);
+			}
+			if ((this.type == Type.COUNTER && this.direction == Direction.NORTH)
+					|| (this.type == Type.CLOCK && this.direction == Direction.WEST)) {
+				boundingWalls.add(Direction.EAST);
+				boundingWalls.add(Direction.SOUTH);
+			}
+			if ((this.type == Type.COUNTER && this.direction == Direction.SOUTH)
+					|| (this.type == Type.CLOCK && this.direction == Direction.EAST)) {
+				boundingWalls.add(Direction.NORTH);
+				boundingWalls.add(Direction.WEST);
+			}
+			if ((this.type == Type.COUNTER && this.direction == Direction.WEST)
+					|| (this.type == Type.CLOCK && this.direction == Direction.SOUTH)) {
+				boundingWalls.add(Direction.NORTH);
+				boundingWalls.add(Direction.EAST);
+			}
+		}
+	}
+
 	public Entity returnAsEntity(World world, Texture texture) {
 		Entity tube = world.createEntity();
 		Renderable renderable = new Renderable(texture);
@@ -79,7 +121,36 @@ public class Tube {
 		RenderBody ddc = new RenderBody(this.bounds);
 		Deletable dc = new Deletable(false);
 		tube.edit().add(renderable).add(dc).add(pc).add(ddc);
+		this.createWalls(world, tube);
 		return tube;
+	}
+
+	private void createWalls(World world, Entity parent) {
+		float thickness = 1f;
+		for (Direction d : boundingWalls) {
+			Entity wall = world.createEntity();
+			CollidableComponent cc = new CollidableComponent(CollisionType.WALL);
+			Position pos = new Position(0, 0);
+			PhysicsBody pb = new PhysicsBody(0, 0);
+			if (d == Direction.NORTH) {
+				pos = new Position(this.position.x, this.position.y + this.bounds.y);
+				pb = new PhysicsBody(this.bounds.x, thickness);
+			} else if (d == Direction.EAST) {
+				pos = new Position(this.position.x + this.bounds.x, this.position.y);
+				pb = new PhysicsBody(thickness, this.bounds.y);
+			} else if (d == Direction.SOUTH) {
+				pos = new Position(this.position.x, this.position.y - thickness);
+				pb = new PhysicsBody(this.bounds.x, thickness);
+			} else if (d == Direction.WEST) {
+				pos = new Position(this.position.x - thickness, this.position.y);
+				pb = new PhysicsBody(thickness, this.bounds.y);
+			}
+			Renderable rc = new Renderable(new Texture(Gdx.files.internal("black.png")));
+			RenderBody rb = new RenderBody(pb.width, pb.height);
+			Deletable dc = new Deletable(false);
+			HasParent hp = new HasParent(parent);
+			wall.edit().add(cc).add(pos).add(pb).add(rc).add(rb).add(dc).add(hp);
+		}
 	}
 
 	public Vector2 getPosition() {

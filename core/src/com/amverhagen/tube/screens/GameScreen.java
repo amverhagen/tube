@@ -15,6 +15,7 @@ import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderConnectedPoints;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
+import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
@@ -83,10 +84,11 @@ public class GameScreen implements Screen {
 
 	private void addPlayer() {
 		player = world.createEntity();
+		Deletable dc = new Deletable(false);
 		RenderBody renderBody = new RenderBody(.5f, .5f);
 		PhysicsBody physicsBody = new PhysicsBody(.5f, .5f);
 		ForeGround fg = new ForeGround();
-		Position position = new Position(1, 1);
+		Position position = new Position(.25f, .25f);
 		Center center = new Center(position, renderBody);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
 		Renderable drawComp = new Renderable(new Texture(Gdx.files.internal("green_circle.png")));
@@ -100,7 +102,7 @@ public class GameScreen implements Screen {
 		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
 		player.edit().add(physicsBody).add(fg).add(position).add(renderBody).add(center).add(cameraFocus).add(drawComp)
 				.add(speedComp).add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp)
-				.add(setDirectionComp).add(crc);
+				.add(setDirectionComp).add(crc).add(dc);
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 

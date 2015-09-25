@@ -43,7 +43,7 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 
 	private void createCollidableCenterAt(Vector2 center) {
 		Entity tubeCenter = world.createEntity();
-		PhysicsBody body = new PhysicsBody(2f, 2f);
+		PhysicsBody body = new PhysicsBody(1.25f, 1.25f);
 		Position pos = new Position(center.x - (body.width / 2), center.y - (body.height / 2));
 		CollidableComponent crc = new CollidableComponent(CollisionType.ORB);
 		Deletable dc = new Deletable(false);

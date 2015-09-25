@@ -101,12 +101,12 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		if (delta > .1)
+			delta = .1f;
 		Gdx.gl.glClearColor(1, 1, 1f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
-		if (delta > .1)
-			delta = .1f;
 		world.setDelta(delta);
 		world.process();
 		game.gameBatch.begin();

@@ -24,7 +24,7 @@ public class DeleteChildEntitySystem extends com.artemis.systems.EntityProcessin
 		Deletable childDeletable = deleteMapper.get(e);
 		Deletable parentDeletable = deleteMapper.get(hasParent.parent);
 
-		if (parentDeletable.needsDeleted) {
+		if (parentDeletable == null || parentDeletable.needsDeleted) {
 			childDeletable.needsDeleted = true;
 		}
 	}

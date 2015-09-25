@@ -26,6 +26,7 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 	private Entity player;
 	private Position playerPos;
 	private PhysicsBody playerBounds;
+	private Deletable playerDeletion;
 	private ScreenState state;
 
 	@SuppressWarnings("unchecked")
@@ -36,9 +37,12 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 
 	@Override
 	protected void begin() {
-		player = world.getManager(TagManager.class).getEntity("PLAYER");
-		playerPos = player.getComponent(Position.class);
-		playerBounds = player.getComponent(PhysicsBody.class);
+		if (state.state == State.RUNNING) {
+			player = world.getManager(TagManager.class).getEntity("PLAYER");
+			playerPos = positionMapper.get(player);
+			playerBounds = physicsBodyMapper.get(player);
+			playerDeletion = deleteMapper.get(player);
+		}
 	}
 
 	@Override
@@ -62,6 +66,8 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 			d.needsDeleted = true;
 			world.getManager(TubeManager.class).addTube();
 		} else if (ct == CollisionType.WALL) {
+			state.state = State.PAUSED;
+			playerDeletion.needsDeleted = true;
 		}
 	}
 }
