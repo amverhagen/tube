@@ -12,7 +12,6 @@ import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Entity;
 import com.artemis.World;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
@@ -145,11 +144,12 @@ public class Tube {
 				pos = new Position(this.position.x - thickness, this.position.y);
 				pb = new PhysicsBody(thickness, this.bounds.y);
 			}
-			Renderable rc = new Renderable(new Texture(Gdx.files.internal("black.png")));
-			RenderBody rb = new RenderBody(pb.width, pb.height);
+			// Renderable rc = new Renderable(new
+			// Texture(Gdx.files.internal("black.png")));
+			// RenderBody rb = new RenderBody(pb.width, pb.height);
 			Deletable dc = new Deletable(false);
 			HasParent hp = new HasParent(parent);
-			wall.edit().add(cc).add(pos).add(pb).add(rc).add(rb).add(dc).add(hp);
+			wall.edit().add(cc).add(pos).add(pb).add(dc).add(hp);
 		}
 	}
 

@@ -35,6 +35,9 @@ public class MainMenuScreen implements Screen {
 	World world;
 	Entity title;
 	Entity playButton;
+	Entity blueButton;
+	Entity blackButton;
+	Entity pinkButton;
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
@@ -44,7 +47,6 @@ public class MainMenuScreen implements Screen {
 		createWorld();
 		createTitle();
 		createButtons();
-		createBackground();
 		createBackground();
 	}
 
@@ -70,6 +72,33 @@ public class MainMenuScreen implements Screen {
 					@Override
 					public void action() {
 						game.setToGameScreen();
+					}
+				});
+		blueButton = createButtonEntity(new Texture(Gdx.files.internal("blue.png")), new Vector2(1.5f, .5f),
+				new Vector2(.5f, .5f), new Event() {
+					@Override
+					public void action() {
+						game.background.r = 0;
+						game.background.g = 0;
+						game.background.b = 1f;
+					}
+				});
+		blackButton = createButtonEntity(new Texture(Gdx.files.internal("black.png")), new Vector2(.5f, .5f),
+				new Vector2(.5f, .5f), new Event() {
+					@Override
+					public void action() {
+						game.background.r = 0;
+						game.background.g = 0;
+						game.background.b = 0;
+					}
+				});
+		pinkButton = createButtonEntity(new Texture(Gdx.files.internal("pink.png")), new Vector2(2.5f, .5f),
+				new Vector2(.5f, .5f), new Event() {
+					@Override
+					public void action() {
+						game.background.r = 1f;
+						game.background.g = .5f;
+						game.background.b = .5f;
 					}
 				});
 	}
@@ -103,7 +132,7 @@ public class MainMenuScreen implements Screen {
 	public void render(float delta) {
 		if (delta > .1)
 			delta = .1f;
-		Gdx.gl.glClearColor(1, 1, 1f, 1);
+		Gdx.gl.glClearColor(game.background.r, game.background.g, game.background.b, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);

@@ -7,6 +7,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class TubeGame extends Game {
 	public final static int GAME_WIDTH = 160000;
 	public final static int GAME_HEIGHT = 90000;
+	public Color background;
 	public AssetManager assManager;
 	public ScreenState state;
 	public SpriteBatch gameBatch;
@@ -30,6 +32,7 @@ public class TubeGame extends Game {
 
 	@Override
 	public void create() {
+		this.background = new Color(0, 0, 1, 1);
 		loadAssets();
 		float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
 		gameCamera = new OrthographicCamera();
