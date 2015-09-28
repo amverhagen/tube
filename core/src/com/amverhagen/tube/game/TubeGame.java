@@ -23,7 +23,6 @@ public class TubeGame extends Game {
 	public SpriteBatch gameBatch;
 	public ShapeRenderer shapeRenderer;
 	public Camera gameCamera;
-	public SpriteBatch uiBatch;
 	public Camera uiCamera;
 	public FitViewport viewport;
 	public FitViewport uiViewport;
@@ -48,7 +47,6 @@ public class TubeGame extends Game {
 		uiViewport.apply();
 		uiViewport.getCamera().position.set((float) uiCamera.viewportWidth / 2, (float) uiCamera.viewportHeight / 2, 0);
 		uiViewport.getCamera().update();
-		uiBatch = new SpriteBatch();
 
 		gameBatch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
@@ -81,5 +79,10 @@ public class TubeGame extends Game {
 	@Override
 	public void render() {
 		super.render();
+	}
+
+	@Override
+	public void dispose() {
+		assManager.dispose();
 	}
 }

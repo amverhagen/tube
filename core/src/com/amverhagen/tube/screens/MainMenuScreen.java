@@ -33,11 +33,6 @@ public class MainMenuScreen implements Screen {
 	private TubeGame game;
 	private ScreenState state;
 	World world;
-	Entity title;
-	Entity playButton;
-	Entity blueButton;
-	Entity blackButton;
-	Entity pinkButton;
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
@@ -54,12 +49,12 @@ public class MainMenuScreen implements Screen {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(new UiClickSystem(game.uiCamera, state));
 		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
-		worldConfig.setSystem(new RenderUISystem(game.uiBatch, game.uiCamera));
+		worldConfig.setSystem(new RenderUISystem(game.gameBatch, game.uiCamera));
 		world = new World(worldConfig);
 	}
 
 	public void createTitle() {
-		title = world.createEntity();
+		Entity title = world.createEntity();
 		Position pc = new Position(4f, 4f);
 		RenderBody ddc = new RenderBody(2f, 1f);
 		UIRenderable dc = new UIRenderable(game.assManager.get("tube_title.png", Texture.class));
@@ -67,15 +62,15 @@ public class MainMenuScreen implements Screen {
 	}
 
 	public void createButtons() {
-		playButton = createButtonEntity(new Texture(Gdx.files.internal("play.png")), new Vector2(4, .5f),
-				new Vector2(2, 1), new Event() {
+		createButtonEntity(new Texture(Gdx.files.internal("play.png")), new Vector2(4, .5f), new Vector2(2, 1),
+				new Event() {
 					@Override
 					public void action() {
 						game.setToGameScreen();
 					}
 				});
-		blueButton = createButtonEntity(new Texture(Gdx.files.internal("blue.png")), new Vector2(1.5f, .5f),
-				new Vector2(.5f, .5f), new Event() {
+		createButtonEntity(new Texture(Gdx.files.internal("blue.png")), new Vector2(1.5f, .5f), new Vector2(.5f, .5f),
+				new Event() {
 					@Override
 					public void action() {
 						game.background.r = 0;
@@ -83,8 +78,8 @@ public class MainMenuScreen implements Screen {
 						game.background.b = 1f;
 					}
 				});
-		blackButton = createButtonEntity(new Texture(Gdx.files.internal("black.png")), new Vector2(.5f, .5f),
-				new Vector2(.5f, .5f), new Event() {
+		createButtonEntity(new Texture(Gdx.files.internal("black.png")), new Vector2(.5f, .5f), new Vector2(.5f, .5f),
+				new Event() {
 					@Override
 					public void action() {
 						game.background.r = 0;
@@ -92,8 +87,8 @@ public class MainMenuScreen implements Screen {
 						game.background.b = 0;
 					}
 				});
-		pinkButton = createButtonEntity(new Texture(Gdx.files.internal("pink.png")), new Vector2(2.5f, .5f),
-				new Vector2(.5f, .5f), new Event() {
+		createButtonEntity(new Texture(Gdx.files.internal("pink.png")), new Vector2(2.5f, .5f), new Vector2(.5f, .5f),
+				new Event() {
 					@Override
 					public void action() {
 						game.background.r = 1f;

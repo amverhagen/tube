@@ -69,7 +69,7 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(new RenderConnectedPointsSystem(game.shapeRenderer));
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
-		worldConfig.setSystem(ShiftDirectionLeftOrRightByPressSystem.class);
+		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
 		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
