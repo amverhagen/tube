@@ -10,7 +10,7 @@ import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
-import com.amverhagen.tube.components.RenderConnectedPoints;
+import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
@@ -62,16 +62,21 @@ public class GameScreen implements Screen {
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
-		this.gameState = new ScreenState(State.LOADING);
+		this.gameState = new ScreenState(State.PAUSED);
 		this.tubeManager = new TubeManager(this.game);
 		this.tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+
+		createWorld();
+	}
+
+	private void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(BindSpriteToPositionSystem.class);
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
-		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
-		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer));
+		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
+		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
 		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
@@ -84,17 +89,12 @@ public class GameScreen implements Screen {
 		worldConfig.setManager(tubeManager);
 
 		world = new World(worldConfig);
-		addPlayer();
-		addLabel();
 	}
 
-	private void addPlayer() {
+	private void createPlayer() {
 		player = world.createEntity();
 		Deletable dc = new Deletable(false);
 		Position position = new Position(.25f, .25f);
-		SpriteComponent sc = new SpriteComponent(new Sprite(new Texture(Gdx.files.internal("green_circle.png"))));
-		sc.sprite.setBounds(position.x, position.y, .5f, .5f);
-		DrawToForeground fgc = new DrawToForeground();
 		RenderBody renderBody = new RenderBody(.5f, .5f);
 		PhysicsBody physicsBody = new PhysicsBody(.5f, .5f);
 		Center center = new Center(position, renderBody);
@@ -103,17 +103,17 @@ public class GameScreen implements Screen {
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
 		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
-		RenderConnectedPoints renderPointsComp = new RenderConnectedPoints(Color.BLUE, .05f);
+		DrawShape renderPointsComp = new DrawShape(Color.BLUE, .05f);
 		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress(
 				game.gameCamera);
 		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
-		player.edit().add(physicsBody).add(sc).add(fgc).add(position).add(renderBody).add(center).add(cameraFocus)
-				.add(speedComp).add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp)
-				.add(setDirectionComp).add(crc).add(dc);
+		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
+				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp).add(crc)
+				.add(dc);
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
-	private void addLabel() {
+	private void createLabel() {
 		Entity e = world.createEntity();
 		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("white.png", Texture.class)));
 		sc.sprite.setBounds(0, 0, 1f, 1f);
@@ -121,11 +121,20 @@ public class GameScreen implements Screen {
 		e.edit().add(sc).add(dui);
 	}
 
+	public void createBackground() {
+		Entity e = world.createEntity();
+		black = new Sprite(game.assManager.get("black.png", Texture.class));
+		black.setBounds(0, 0, 10, 10);
+		SpriteComponent sc = new SpriteComponent(black);
+		DrawToForeground dtfc = new DrawToForeground();
+		e.edit().add(sc).add(dtfc);
+	}
+
 	@Override
 	public void show() {
-		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setPosition(-50, -50);
-		black.setSize(100, 100);
+		createPlayer();
+		createLabel();
+		createBackground();
 		tubeManager.addTube();
 		tubeManager.addTube();
 		tubeManager.addTube();
@@ -149,9 +158,6 @@ public class GameScreen implements Screen {
 			delta = .1f;
 		world.setDelta(delta);
 		world.process();
-		game.gameBatch.begin();
-		black.draw(game.gameBatch);
-		game.gameBatch.end();
 		tweenManager.update(delta);
 	}
 

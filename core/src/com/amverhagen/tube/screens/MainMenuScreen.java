@@ -19,6 +19,7 @@ import com.artemis.World;
 import com.artemis.WorldConfiguration;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -38,7 +39,7 @@ public class MainMenuScreen implements Screen {
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
-		state = new ScreenState(State.LOADING);
+		state = new ScreenState(State.FADING);
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		createWorld();
@@ -77,27 +78,27 @@ public class MainMenuScreen implements Screen {
 				new Event() {
 					@Override
 					public void action() {
-						game.background.r = 0;
-						game.background.g = 0;
-						game.background.b = 1f;
+						game.background = new Color(0, 0, 1, 1);
+						System.out.println(game.background);
+						game.shapeRenderer.setColor(game.background);
 					}
 				});
 		createButtonEntity(new Texture(Gdx.files.internal("black.png")), new Vector2(.5f, .5f), new Vector2(.5f, .5f),
 				new Event() {
 					@Override
 					public void action() {
-						game.background.r = 0;
-						game.background.g = 0;
-						game.background.b = 0;
+						game.background = new Color(0, 0, 0, 1);
+						System.out.println(game.background);
+						game.shapeRenderer.setColor(game.background);
 					}
 				});
 		createButtonEntity(new Texture(Gdx.files.internal("pink.png")), new Vector2(2.5f, .5f), new Vector2(.5f, .5f),
 				new Event() {
 					@Override
 					public void action() {
-						game.background.r = 1f;
-						game.background.g = .5f;
-						game.background.b = .5f;
+						game.background = new Color(1, .5f, .5f, 1);
+						System.out.println(game.background);
+						game.shapeRenderer.setColor(game.background);
 					}
 				});
 	}

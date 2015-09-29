@@ -9,6 +9,6 @@ public class ScreenState {
 	}
 
 	public enum State {
-		LOADING, PAUSED, RUNNING;
+		FADING, PAUSED, RUNNING;
 	}
 }
