@@ -2,11 +2,9 @@ package com.amverhagen.tube.screens;
 
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
 import com.amverhagen.tube.components.RenderBody;
-import com.amverhagen.tube.components.ForeGround;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.CollidableComponent;
-import com.amverhagen.tube.components.Renderable;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.PhysicsBody;
@@ -14,19 +12,24 @@ import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderConnectedPoints;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
+import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.DrawToForeground;
+import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
+import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DeleteChildEntitySystem;
 import com.amverhagen.tube.systems.DeleteEntitySystem;
-import com.amverhagen.tube.systems.DrawingSystem;
-import com.amverhagen.tube.systems.ForeGroundSystem;
+import com.amverhagen.tube.systems.DrawToForegroundSystem;
+import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
-import com.amverhagen.tube.systems.RenderConnectedPointsSystem;
+import com.amverhagen.tube.systems.DrawConnectedPointsSystem;
+import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
@@ -64,9 +67,11 @@ public class GameScreen implements Screen {
 		this.tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 		WorldConfiguration worldConfig = new WorldConfiguration();
-		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
-		worldConfig.setSystem(new ForeGroundSystem(game.gameBatch));
-		worldConfig.setSystem(new RenderConnectedPointsSystem(game.shapeRenderer));
+		worldConfig.setSystem(BindSpriteToPositionSystem.class);
+		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
+		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
+		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer));
+		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
 		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
@@ -80,18 +85,20 @@ public class GameScreen implements Screen {
 
 		world = new World(worldConfig);
 		addPlayer();
+		addLabel();
 	}
 
 	private void addPlayer() {
 		player = world.createEntity();
 		Deletable dc = new Deletable(false);
+		Position position = new Position(.25f, .25f);
+		SpriteComponent sc = new SpriteComponent(new Sprite(new Texture(Gdx.files.internal("green_circle.png"))));
+		sc.sprite.setBounds(position.x, position.y, .5f, .5f);
+		DrawToForeground fgc = new DrawToForeground();
 		RenderBody renderBody = new RenderBody(.5f, .5f);
 		PhysicsBody physicsBody = new PhysicsBody(.5f, .5f);
-		ForeGround fg = new ForeGround();
-		Position position = new Position(.25f, .25f);
 		Center center = new Center(position, renderBody);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
-		Renderable drawComp = new Renderable(new Texture(Gdx.files.internal("green_circle.png")));
 		MovementSpeed speedComp = new MovementSpeed(8f);
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
@@ -100,10 +107,18 @@ public class GameScreen implements Screen {
 		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress(
 				game.gameCamera);
 		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
-		player.edit().add(physicsBody).add(fg).add(position).add(renderBody).add(center).add(cameraFocus).add(drawComp)
+		player.edit().add(physicsBody).add(sc).add(fgc).add(position).add(renderBody).add(center).add(cameraFocus)
 				.add(speedComp).add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp)
 				.add(setDirectionComp).add(crc).add(dc);
 		world.getManager(TagManager.class).register("PLAYER", player);
+	}
+
+	private void addLabel() {
+		Entity e = world.createEntity();
+		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("white.png", Texture.class)));
+		sc.sprite.setBounds(0, 0, 1f, 1f);
+		DrawToUI dui = new DrawToUI();
+		e.edit().add(sc).add(dui);
 	}
 
 	@Override
@@ -160,6 +175,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
+		world.dispose();
 	}
-
 }

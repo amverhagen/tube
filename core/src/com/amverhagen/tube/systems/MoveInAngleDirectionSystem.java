@@ -34,6 +34,5 @@ public class MoveInAngleDirectionSystem extends com.artemis.systems.EntityProces
 			posComp.x += (float) (Math.cos(angleComp.angle) * (speedComp.movementSpeed) * world.delta);
 			posComp.y += (float) (Math.sin(angleComp.angle) * (speedComp.movementSpeed) * world.delta);
 		}
-
 	}
 }

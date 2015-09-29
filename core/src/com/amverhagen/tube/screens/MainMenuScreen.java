@@ -2,16 +2,18 @@ package com.amverhagen.tube.screens;
 
 import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.Clickable.Event;
-import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.DrawToForeground;
+import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.components.UIRenderable;
+import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.game.TubeGame;
-import com.amverhagen.tube.systems.UiClickSystem;
-import com.amverhagen.tube.tween.SpriteAccessor;
-import com.amverhagen.tube.systems.DrawingSystem;
-import com.amverhagen.tube.systems.RenderUISystem;
+import com.amverhagen.tube.systems.DrawToForegroundSystem;
+import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.systems.UiClickSystem;
+import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
@@ -32,7 +34,7 @@ public class MainMenuScreen implements Screen {
 	private Sprite black;
 	private TubeGame game;
 	private ScreenState state;
-	World world;
+	private World world;
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
@@ -48,8 +50,8 @@ public class MainMenuScreen implements Screen {
 	public void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(new UiClickSystem(game.uiCamera, state));
-		worldConfig.setSystem(new DrawingSystem(game.gameBatch));
-		worldConfig.setSystem(new RenderUISystem(game.gameBatch, game.uiCamera));
+		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
+		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		world = new World(worldConfig);
 	}
 
@@ -57,8 +59,10 @@ public class MainMenuScreen implements Screen {
 		Entity title = world.createEntity();
 		Position pc = new Position(4f, 4f);
 		RenderBody ddc = new RenderBody(2f, 1f);
-		UIRenderable dc = new UIRenderable(game.assManager.get("tube_title.png", Texture.class));
-		title.edit().add(pc).add(ddc).add(dc);
+		DrawToUI dtui = new DrawToUI();
+		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("tube_title.png", Texture.class)));
+		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
+		title.edit().add(pc).add(sc).add(dtui);
 	}
 
 	public void createButtons() {
@@ -100,17 +104,23 @@ public class MainMenuScreen implements Screen {
 
 	public Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body, Event event) {
 		Entity e = world.createEntity();
-		UIRenderable uic = new UIRenderable(texture);
+		DrawToUI uic = new DrawToUI();
 		Position pc = new Position(pos);
 		RenderBody ddc = new RenderBody(body);
+		SpriteComponent sc = new SpriteComponent(new Sprite(texture));
+		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
 		Clickable cc = new Clickable(event);
-		e.edit().add(uic).add(pc).add(ddc).add(cc);
+		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
 		return e;
 	}
 
 	public void createBackground() {
+		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setSize(100, 100);
+		black.setBounds(0, 0, 10, 10);
+		SpriteComponent sc = new SpriteComponent(black);
+		DrawToForeground dtfc = new DrawToForeground();
+		e.edit().add(sc).add(dtfc);
 	}
 
 	@Override
@@ -130,12 +140,8 @@ public class MainMenuScreen implements Screen {
 		Gdx.gl.glClearColor(game.background.r, game.background.g, game.background.b, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
-		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
 		world.setDelta(delta);
 		world.process();
-		game.gameBatch.begin();
-		black.draw(game.gameBatch);
-		game.gameBatch.end();
 		tweenManager.update(delta);
 	}
 

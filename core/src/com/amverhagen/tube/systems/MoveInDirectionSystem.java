@@ -9,7 +9,6 @@ import com.artemis.ComponentMapper;
 import com.artemis.Entity;
 import com.artemis.annotations.Wire;
 import com.artemis.systems.EntityProcessingSystem;
-import com.badlogic.gdx.Gdx;
 
 public class MoveInDirectionSystem extends EntityProcessingSystem {
 	@Wire
@@ -32,7 +31,7 @@ public class MoveInDirectionSystem extends EntityProcessingSystem {
 			Position positionComp = positionMapper.get(e);
 			MovementDirection directionComp = directionMapper.get(e);
 			MovementSpeed speedComp = speedMapper.get(e);
-			float speed = speedComp.movementSpeed * Gdx.graphics.getDeltaTime();
+			float speed = speedComp.movementSpeed * world.delta;
 
 			if (directionComp.direction == MovementDirection.Direction.NORTH) {
 				positionComp.y += speed;

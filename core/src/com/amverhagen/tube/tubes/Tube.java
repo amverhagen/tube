@@ -2,17 +2,18 @@ package com.amverhagen.tube.tubes;
 
 import java.util.ArrayList;
 
-import com.amverhagen.tube.components.Renderable;
-import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.HasParent;
 import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
 public class Tube {
@@ -115,11 +116,12 @@ public class Tube {
 
 	public Entity returnAsEntity(World world, Texture texture) {
 		Entity tube = world.createEntity();
-		Renderable renderable = new Renderable(texture);
+		SpriteComponent sc = new SpriteComponent(new Sprite(texture));
 		Position pc = new Position(this.position);
-		RenderBody ddc = new RenderBody(this.bounds);
+		sc.sprite.setBounds(pc.x, pc.y, this.bounds.x, this.bounds.y);
 		Deletable dc = new Deletable(false);
-		tube.edit().add(renderable).add(dc).add(pc).add(ddc);
+		DrawToBackground dtb = new DrawToBackground();
+		tube.edit().add(sc).add(dc).add(pc).add(dtb);
 		this.createWalls(world, tube);
 		return tube;
 	}
@@ -144,9 +146,6 @@ public class Tube {
 				pos = new Position(this.position.x - thickness, this.position.y);
 				pb = new PhysicsBody(thickness, this.bounds.y);
 			}
-			// Renderable rc = new Renderable(new
-			// Texture(Gdx.files.internal("black.png")));
-			// RenderBody rb = new RenderBody(pb.width, pb.height);
 			Deletable dc = new Deletable(false);
 			HasParent hp = new HasParent(parent);
 			wall.edit().add(cc).add(pos).add(pb).add(dc).add(hp);

@@ -84,5 +84,7 @@ public class TubeGame extends Game {
 	@Override
 	public void dispose() {
 		assManager.dispose();
+		menuScreen.dispose();
+		gameScreen.dispose();
 	}
 }

@@ -10,7 +10,7 @@ import com.artemis.annotations.Wire;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
-public class RenderConnectedPointsSystem extends com.artemis.systems.EntityProcessingSystem {
+public class DrawConnectedPointsSystem extends com.artemis.systems.EntityProcessingSystem {
 	ShapeRenderer renderer;
 	@Wire
 	ComponentMapper<RecordConnectedPoints> connectedPointsMapper;
@@ -18,7 +18,7 @@ public class RenderConnectedPointsSystem extends com.artemis.systems.EntityProce
 	ComponentMapper<RenderConnectedPoints> renderPointsMapper;
 
 	@SuppressWarnings("unchecked")
-	public RenderConnectedPointsSystem(ShapeRenderer renderer) {
+	public DrawConnectedPointsSystem(ShapeRenderer renderer) {
 		super(Aspect.all(RecordConnectedPoints.class, RenderConnectedPoints.class));
 		this.renderer = renderer;
 	}
@@ -26,6 +26,7 @@ public class RenderConnectedPointsSystem extends com.artemis.systems.EntityProce
 	@Override
 	protected void begin() {
 		this.renderer.begin();
+		this.renderer.set(ShapeType.Filled);
 	}
 
 	@Override
@@ -33,7 +34,6 @@ public class RenderConnectedPointsSystem extends com.artemis.systems.EntityProce
 		RecordConnectedPoints pointsComp = connectedPointsMapper.get(e);
 		RenderConnectedPoints renderComp = renderPointsMapper.get(e);
 		this.renderer.setColor(renderComp.color);
-		this.renderer.set(ShapeType.Filled);
 		for (ConnectedPoint cp : pointsComp.points.connectedPoints) {
 			if (cp != null) {
 				this.renderer.rectLine(cp.pointBehind.pos.x, cp.pointBehind.pos.y, cp.pos.x, cp.pos.y,
