@@ -3,7 +3,6 @@ package com.amverhagen.tube.systems;
 import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
@@ -40,11 +39,11 @@ public class UiClickSystem extends com.artemis.systems.EntityProcessingSystem {
 
 	@Override
 	protected void process(Entity e) {
-		if (state.state == State.RUNNING) {
+		Clickable clickComp = clickMapper.get(e);
+		if (state.state == clickComp.actionState) {
 			if (Gdx.input.justTouched()) {
 				RenderBody drawComp = dimensionMapper.get(e);
 				Position pos = positionMapper.get(e);
-				Clickable clickComp = clickMapper.get(e);
 				if ((unprojected.x >= pos.x) && (unprojected.x <= (pos.x + drawComp.width)) && (unprojected.y >= pos.y)
 						&& (unprojected.y <= (pos.y + drawComp.height))) {
 					clickComp.event.action();

@@ -4,6 +4,7 @@ import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
+import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
@@ -13,6 +14,7 @@ import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.SpriteComponent;
+import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DrawToForeground;
@@ -33,6 +35,7 @@ import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
+import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.systems.UpdateCenterSystem;
 import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
@@ -62,25 +65,21 @@ public class GameScreen implements Screen {
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
-		this.gameState = new ScreenState(State.PAUSED);
-		this.tubeManager = new TubeManager(this.game);
-		this.tweenManager = new TweenManager();
-		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
-
-		createWorld();
+		this.world = new World();
 	}
 
 	private void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(BindSpriteToPositionSystem.class);
+		worldConfig.setSystem(new UiClickSystem(game.uiCamera, gameState));
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
-		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
+		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
 		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
 		worldConfig.setSystem(DeleteChildEntitySystem.class);
@@ -104,8 +103,7 @@ public class GameScreen implements Screen {
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
 		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
 		DrawShape renderPointsComp = new DrawShape(Color.BLUE, .05f);
-		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress(
-				game.gameCamera);
+		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress();
 		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
 		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
 				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp).add(crc)
@@ -115,10 +113,18 @@ public class GameScreen implements Screen {
 
 	private void createLabel() {
 		Entity e = world.createEntity();
+		Position pc = new Position(0, 0);
+		RenderBody ddc = new RenderBody(1f, 1f);
 		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("white.png", Texture.class)));
 		sc.sprite.setBounds(0, 0, 1f, 1f);
 		DrawToUI dui = new DrawToUI();
-		e.edit().add(sc).add(dui);
+		Clickable cc = new Clickable(State.PAUSED, new Event() {
+			@Override
+			public void action() {
+				show();
+			}
+		});
+		e.edit().add(sc).add(dui).add(pc).add(ddc).add(cc);
 	}
 
 	public void createBackground() {
@@ -132,6 +138,11 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
+		this.gameState = new ScreenState(State.PAUSED);
+		this.tubeManager = new TubeManager(this.game);
+		this.tweenManager = new TweenManager();
+		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+		createWorld();
 		createPlayer();
 		createLabel();
 		createBackground();

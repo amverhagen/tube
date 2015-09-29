@@ -110,7 +110,7 @@ public class MainMenuScreen implements Screen {
 		RenderBody ddc = new RenderBody(body);
 		SpriteComponent sc = new SpriteComponent(new Sprite(texture));
 		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
-		Clickable cc = new Clickable(event);
+		Clickable cc = new Clickable(State.RUNNING, event);
 		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
 		return e;
 	}
