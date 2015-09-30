@@ -31,7 +31,7 @@ public class TubeGame extends Game {
 
 	@Override
 	public void create() {
-		this.background = new Color(0, 0, 1, 1);
+		this.background = new Color(45f / 255f, 101f / 255f, 174f / 255f, 1);
 		this.loadAssets();
 		float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
 		gameCamera = new OrthographicCamera();

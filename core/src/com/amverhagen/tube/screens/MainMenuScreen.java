@@ -74,36 +74,19 @@ public class MainMenuScreen implements Screen {
 						game.setToGameScreen();
 					}
 				});
-		createButtonEntity(new Texture(Gdx.files.internal("blue.png")), new Vector2(1.5f, .5f), new Vector2(.5f, .5f),
-				new Event() {
-					@Override
-					public void action() {
-						game.background = new Color(0, 0, 1, 1);
-						System.out.println(game.background);
-						game.shapeRenderer.setColor(game.background);
-					}
-				});
-		createButtonEntity(new Texture(Gdx.files.internal("black.png")), new Vector2(.5f, .5f), new Vector2(.5f, .5f),
-				new Event() {
-					@Override
-					public void action() {
-						game.background = new Color(0, 0, 0, 1);
-						System.out.println(game.background);
-						game.shapeRenderer.setColor(game.background);
-					}
-				});
-		createButtonEntity(new Texture(Gdx.files.internal("pink.png")), new Vector2(2.5f, .5f), new Vector2(.5f, .5f),
-				new Event() {
-					@Override
-					public void action() {
-						game.background = new Color(1, .5f, .5f, 1);
-						System.out.println(game.background);
-						game.shapeRenderer.setColor(game.background);
-					}
-				});
+		createColorButtonEntity(new Color(45f / 255f, 101f / 255f, 174f / 255f, 1), new Vector2(.5f, .5f),
+				new Vector2(.5f, .5f));
+		createColorButtonEntity(new Color(0f, 0f, 0f, 1), new Vector2(1.5f, .5f), new Vector2(.5f, .5f));
+		createColorButtonEntity(new Color(1f, .5f, .5f, 1), new Vector2(2.5f, .5f), new Vector2(.5f, .5f));
+		createColorButtonEntity(new Color(9f / 255f, 174f / 255f, 11f / 255f, 1), new Vector2(7f, .5f),
+				new Vector2(.5f, .5f));
+		createColorButtonEntity(new Color(99f / 255f, 33f / 255f, 130f / 255f, 1), new Vector2(8f, .5f),
+				new Vector2(.5f, .5f));
+		createColorButtonEntity(new Color(209f / 255, 10f / 255f, 10f / 255f, 1), new Vector2(9f, .5f),
+				new Vector2(.5f, .5f));
 	}
 
-	public Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body, Event event) {
+	private Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body, Event event) {
 		Entity e = world.createEntity();
 		DrawToUI uic = new DrawToUI();
 		Position pc = new Position(pos);
@@ -111,6 +94,25 @@ public class MainMenuScreen implements Screen {
 		SpriteComponent sc = new SpriteComponent(new Sprite(texture));
 		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
 		Clickable cc = new Clickable(State.RUNNING, event);
+		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
+		return e;
+	}
+
+	private Entity createColorButtonEntity(final Color c, Vector2 pos, Vector2 body) {
+		Entity e = world.createEntity();
+		DrawToUI uic = new DrawToUI();
+		Position pc = new Position(pos);
+		RenderBody ddc = new RenderBody(body);
+		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("white.png", Texture.class)));
+		sc.sprite.setColor(c);
+		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
+		Clickable cc = new Clickable(State.RUNNING, new Event() {
+			@Override
+			public void action() {
+				game.background = new Color(c.r, c.g, c.b, 1);
+				game.shapeRenderer.setColor(game.background);
+			}
+		});
 		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
 		return e;
 	}
