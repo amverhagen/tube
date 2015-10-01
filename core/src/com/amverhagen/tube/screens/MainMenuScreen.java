@@ -1,15 +1,16 @@
 package com.amverhagen.tube.screens;
 
-import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.SpriteComponent;
+import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
+import com.amverhagen.tube.systems.FadeSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.UiClickSystem;
@@ -39,17 +40,15 @@ public class MainMenuScreen implements Screen {
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
-		state = new ScreenState(State.FADING);
+		state = new ScreenState(State.PAUSED);
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
-		createWorld();
-		createTitle();
-		createButtons();
-		createBackground();
+
 	}
 
 	public void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
+		worldConfig.setSystem(new FadeSystem(state, tweenManager));
 		worldConfig.setSystem(new UiClickSystem(game.uiCamera, state));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
@@ -67,13 +66,13 @@ public class MainMenuScreen implements Screen {
 	}
 
 	public void createButtons() {
-		createButtonEntity(new Texture(Gdx.files.internal("play.png")), new Vector2(4, .5f), new Vector2(2, 1),
-				new Event() {
+		ButtonMaker.createButtonEntity(world, new Sprite(new Texture(Gdx.files.internal("play.png"))),
+				new Vector2(4, .5f), new Vector2(2, 1), new Event() {
 					@Override
 					public void action() {
 						game.setToGameScreen();
 					}
-				});
+				}, State.RUNNING);
 		createColorButtonEntity(new Color(45f / 255f, 101f / 255f, 174f / 255f, 1), new Vector2(.5f, .5f),
 				new Vector2(.5f, .5f));
 		createColorButtonEntity(new Color(0f, 0f, 0f, 1), new Vector2(1.5f, .5f), new Vector2(.5f, .5f));
@@ -86,35 +85,17 @@ public class MainMenuScreen implements Screen {
 				new Vector2(.5f, .5f));
 	}
 
-	private Entity createButtonEntity(Texture texture, Vector2 pos, Vector2 body, Event event) {
-		Entity e = world.createEntity();
-		DrawToUI uic = new DrawToUI();
-		Position pc = new Position(pos);
-		RenderBody ddc = new RenderBody(body);
-		SpriteComponent sc = new SpriteComponent(new Sprite(texture));
-		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
-		Clickable cc = new Clickable(State.RUNNING, event);
-		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
-		return e;
-	}
-
-	private Entity createColorButtonEntity(final Color c, Vector2 pos, Vector2 body) {
-		Entity e = world.createEntity();
-		DrawToUI uic = new DrawToUI();
-		Position pc = new Position(pos);
-		RenderBody ddc = new RenderBody(body);
-		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("white.png", Texture.class)));
-		sc.sprite.setColor(c);
-		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
-		Clickable cc = new Clickable(State.RUNNING, new Event() {
+	private void createColorButtonEntity(final Color c, Vector2 pos, Vector2 body) {
+		Sprite sprite = new Sprite(game.assManager.get("white.png", Texture.class));
+		sprite.setColor(c);
+		Event event = new Event() {
 			@Override
 			public void action() {
 				game.background = new Color(c.r, c.g, c.b, 1);
 				game.shapeRenderer.setColor(game.background);
 			}
-		});
-		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
-		return e;
+		};
+		ButtonMaker.createButtonEntity(world, sprite, pos, body, event, State.RUNNING);
 	}
 
 	public void createBackground() {
@@ -126,14 +107,23 @@ public class MainMenuScreen implements Screen {
 		e.edit().add(sc).add(dtfc);
 	}
 
-	@Override
-	public void show() {
+	private void fadeIn() {
+		this.state.state = State.FADING;
 		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
 				state.state = State.RUNNING;
 			}
 		});
+	}
+
+	@Override
+	public void show() {
+		createWorld();
+		createTitle();
+		createButtons();
+		createBackground();
+		this.fadeIn();
 	}
 
 	@Override
@@ -145,13 +135,14 @@ public class MainMenuScreen implements Screen {
 		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
 		world.setDelta(delta);
 		world.process();
-		tweenManager.update(delta);
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		game.viewport.setScreenSize(width, height);
 		game.viewport.apply();
+		game.uiViewport.setScreenSize(width, height);
+		game.uiViewport.apply();
 	}
 
 	@Override

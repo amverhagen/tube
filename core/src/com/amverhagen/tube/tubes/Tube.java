@@ -152,24 +152,8 @@ public class Tube {
 		}
 	}
 
-	public Vector2 getPosition() {
-		return this.position;
-	}
-
-	public Vector2 getBounds() {
-		return this.bounds;
-	}
-
 	public Vector2 getCenter() {
 		return new Vector2(position.x + (bounds.x / 2), position.y + (bounds.y / 2));
-	}
-
-	public Direction getDirection() {
-		return this.direction;
-	}
-
-	public Type getType() {
-		return this.type;
 	}
 
 	public enum Direction {

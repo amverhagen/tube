@@ -1,24 +1,21 @@
 package com.amverhagen.tube.screens;
 
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
-import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
-import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.CollidableComponent;
+import com.amverhagen.tube.components.CollidableComponent.CollisionType;
+import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.DrawShape;
+import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
-import com.amverhagen.tube.components.DrawShape;
+import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.SpriteComponent;
-import com.amverhagen.tube.components.Clickable.Event;
-import com.amverhagen.tube.components.CollidableComponent.CollisionType;
-import com.amverhagen.tube.components.Deletable;
-import com.amverhagen.tube.components.DrawToForeground;
-import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
@@ -27,11 +24,12 @@ import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DeleteChildEntitySystem;
 import com.amverhagen.tube.systems.DeleteEntitySystem;
-import com.amverhagen.tube.systems.DrawToForegroundSystem;
-import com.amverhagen.tube.systems.DrawToUISystem;
-import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.amverhagen.tube.systems.DrawConnectedPointsSystem;
 import com.amverhagen.tube.systems.DrawToBackgroundSystem;
+import com.amverhagen.tube.systems.DrawToForegroundSystem;
+import com.amverhagen.tube.systems.DrawToUISystem;
+import com.amverhagen.tube.systems.FadeSystem;
+import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
@@ -66,11 +64,14 @@ public class GameScreen implements Screen {
 	public GameScreen(TubeGame game) {
 		this.game = game;
 		this.world = new World();
+		this.tweenManager = new TweenManager();
+		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
 	}
 
 	private void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(BindSpriteToPositionSystem.class);
+		worldConfig.setSystem(new FadeSystem(gameState, tweenManager));
 		worldConfig.setSystem(new UiClickSystem(game.uiCamera, gameState));
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
@@ -86,7 +87,6 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(DeleteEntitySystem.class);
 		worldConfig.setManager(new TagManager());
 		worldConfig.setManager(tubeManager);
-
 		world = new World(worldConfig);
 	}
 
@@ -111,22 +111,6 @@ public class GameScreen implements Screen {
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
-	private void createLabel() {
-		Entity e = world.createEntity();
-		Position pc = new Position(0, 0);
-		RenderBody ddc = new RenderBody(1f, 1f);
-		SpriteComponent sc = new SpriteComponent(new Sprite(game.assManager.get("white.png", Texture.class)));
-		sc.sprite.setBounds(0, 0, 1f, 1f);
-		DrawToUI dui = new DrawToUI();
-		Clickable cc = new Clickable(State.PAUSED, new Event() {
-			@Override
-			public void action() {
-				show();
-			}
-		});
-		e.edit().add(sc).add(dui).add(pc).add(ddc).add(cc);
-	}
-
 	public void createBackground() {
 		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
@@ -136,27 +120,35 @@ public class GameScreen implements Screen {
 		e.edit().add(sc).add(dtfc);
 	}
 
-	@Override
-	public void show() {
-		this.gameState = new ScreenState(State.PAUSED);
-		this.tubeManager = new TubeManager(this.game);
-		this.tweenManager = new TweenManager();
-		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
-		createWorld();
-		createPlayer();
-		createLabel();
-		createBackground();
-		tubeManager.addTube();
-		tubeManager.addTube();
-		tubeManager.addTube();
-		tubeManager.addTube();
-
+	private void fadeIn() {
+		this.gameState.state = State.FADING;
 		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
 				gameState.state = State.RUNNING;
 			}
 		});
+	}
+
+	private void fadeOut() {
+		this.gameState.state = State.FADING;
+		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(1).start(tweenManager).setCallback(new TweenCallback() {
+			@Override
+			public void onEvent(int arg0, BaseTween<?> arg1) {
+				game.setToScoreScreen();
+			}
+		});
+	}
+
+	@Override
+	public void show() {
+		this.gameState = new ScreenState(State.PAUSED);
+		this.tubeManager = new TubeManager(this.game);
+		createWorld();
+		createPlayer();
+		createBackground();
+		tubeManager.start();
+		this.fadeIn();
 	}
 
 	@Override
@@ -169,7 +161,8 @@ public class GameScreen implements Screen {
 			delta = .1f;
 		world.setDelta(delta);
 		world.process();
-		tweenManager.update(delta);
+		if (gameState.state == State.OVER)
+			fadeOut();
 	}
 
 	@Override
@@ -195,3 +188,21 @@ public class GameScreen implements Screen {
 		world.dispose();
 	}
 }
+
+//
+// private void createLabel() {
+// Entity e = world.createEntity();
+// Position pc = new Position(0, 0);
+// RenderBody ddc = new RenderBody(1f, 1f);
+// SpriteComponent sc = new SpriteComponent(new
+// Sprite(game.assManager.get("white.png", Texture.class)));
+// sc.sprite.setBounds(0, 0, 1f, 1f);
+// DrawToUI dui = new DrawToUI();
+// Clickable cc = new Clickable(State.PAUSED, new Event() {
+// @Override
+// public void action() {
+// show();
+// }
+// });
+// e.edit().add(sc).add(dui).add(pc).add(ddc).add(cc);
+// }

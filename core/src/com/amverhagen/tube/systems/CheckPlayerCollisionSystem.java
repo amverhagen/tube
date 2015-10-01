@@ -66,7 +66,7 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 			d.needsDeleted = true;
 			world.getManager(TubeManager.class).addTube();
 		} else if (ct == CollisionType.WALL) {
-			state.state = State.PAUSED;
+			state.state = State.OVER;
 			playerDeletion.needsDeleted = true;
 		}
 	}

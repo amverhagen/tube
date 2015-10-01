@@ -2,7 +2,7 @@ package com.amverhagen.tube.game;
 
 import com.amverhagen.tube.screens.GameScreen;
 import com.amverhagen.tube.screens.MainMenuScreen;
-import com.amverhagen.tube.systems.ScreenState;
+import com.amverhagen.tube.screens.ScoreScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -15,11 +15,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class TubeGame extends Game {
-	public final static int GAME_WIDTH = 160000;
-	public final static int GAME_HEIGHT = 90000;
 	public Color background;
 	public AssetManager assManager;
-	public ScreenState state;
 	public SpriteBatch gameBatch;
 	public ShapeRenderer shapeRenderer;
 	public Camera gameCamera;
@@ -28,6 +25,7 @@ public class TubeGame extends Game {
 	public FitViewport uiViewport;
 	private MainMenuScreen menuScreen;
 	private GameScreen gameScreen;
+	private ScoreScreen scoreScreen;
 
 	@Override
 	public void create() {
@@ -54,6 +52,7 @@ public class TubeGame extends Game {
 		shapeRenderer.setColor(background);
 		menuScreen = new MainMenuScreen(this);
 		gameScreen = new GameScreen(this);
+		scoreScreen = new ScoreScreen(this);
 		this.setToMenuScreen();
 	}
 
@@ -73,6 +72,10 @@ public class TubeGame extends Game {
 		this.setScreen(gameScreen);
 	}
 
+	public void setToScoreScreen() {
+		this.setScreen(scoreScreen);
+	}
+
 	@Override
 	public void resize(int width, int height) {
 	}
@@ -87,5 +90,6 @@ public class TubeGame extends Game {
 		assManager.dispose();
 		menuScreen.dispose();
 		gameScreen.dispose();
+		scoreScreen.dispose();
 	}
 }

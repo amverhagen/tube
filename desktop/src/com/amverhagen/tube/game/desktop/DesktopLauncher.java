@@ -9,7 +9,6 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 800;
 		config.height = 450;
-		config.vSyncEnabled = true;
 		new LwjglApplication(new TubeGame(), config);
 	}
 }

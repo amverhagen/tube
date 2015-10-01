@@ -24,6 +24,13 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 		activeTubes = new LinkedListQueue<Entity>();
 	}
 
+	public void start() {
+		this.addTube();
+		this.addTube();
+		this.addTube();
+		this.addTube();
+	}
+
 	public void addTube() {
 		if (activeTubes.size() <= 0) {
 			lastTube = new Tube(new Vector2(0, 0), Type.SHORT, Direction.EAST);
