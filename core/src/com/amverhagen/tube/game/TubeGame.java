@@ -34,7 +34,7 @@ public class TubeGame extends Game {
 		float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
 		gameCamera = new OrthographicCamera();
 
-		viewport = new FitViewport(10f, 10f * aspectRatio, gameCamera);
+		viewport = new FitViewport(12f, 12f * aspectRatio, gameCamera);
 		viewport.apply();
 		viewport.getCamera().position.set((float) gameCamera.viewportWidth / 2, (float) gameCamera.viewportHeight / 2,
 				0);
