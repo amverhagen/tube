@@ -6,6 +6,7 @@ import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.TubeGame;
+import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
@@ -44,6 +45,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 
 	private void createWorld() {
 		WorldConfiguration wc = new WorldConfiguration();
+		wc.setSystem(BindSpriteToPositionSystem.class);
 		wc.setSystem(new FadeSystem(screenState, tweenManager));
 		wc.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		wc.setSystem(new DrawToForegroundSystem(game.gameBatch));
@@ -52,14 +54,14 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 	}
 
 	private void createButtons() {
-		Sprite sprite = new Sprite(game.assManager.get("white.png", Texture.class));
-		ButtonMaker.createButtonEntity(world, sprite, new Vector2(2, .5f), new Vector2(2, 1), new Event() {
+		Sprite sprite = new Sprite(game.assManager.get("button_background.png", Texture.class));
+		ButtonMaker.createButtonEntity(world, sprite, new Vector2(200, 50f), new Vector2(200, 100), new Event() {
 			@Override
 			public void action() {
 				game.setToMenuScreen();
 			}
 		}, State.RUNNING);
-		ButtonMaker.createButtonEntity(world, sprite, new Vector2(6, .5f), new Vector2(2, 1), new Event() {
+		ButtonMaker.createButtonEntity(world, sprite, new Vector2(600, 50f), new Vector2(200, 100), new Event() {
 			@Override
 			public void action() {
 				game.setToGameScreen();
@@ -70,15 +72,13 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 	private void createIcons() {
 		Entity e = world.createEntity();
 		SpriteComponent sc = new SpriteComponent(new Sprite(new Texture(Gdx.files.internal("house.png"))));
-		sc.sprite.setBounds(2.75f, .75f, .5f, .5f);
-		sc.sprite.setColor(game.background);
+		sc.sprite.setBounds(275f, 75f, 50f, 50f);
 		DrawToUI dtui = new DrawToUI();
 		e.edit().add(sc).add(dtui);
 
 		e = world.createEntity();
 		sc = new SpriteComponent(new Sprite(new Texture(Gdx.files.internal("replay.png"))));
-		sc.sprite.setBounds(6.75f, .75f, .5f, .5f);
-		sc.sprite.setColor(game.background);
+		sc.sprite.setBounds(675f, 75f, 50f, 50f);
 		dtui = new DrawToUI();
 		e.edit().add(sc).add(dtui);
 	}
@@ -86,7 +86,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 	public void createBackground() {
 		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setBounds(0, 0, 10, 10);
+		black.setBounds(0, 0, 1000, 1000);
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();
 		e.edit().add(sc).add(dtfc);

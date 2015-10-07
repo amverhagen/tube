@@ -32,16 +32,16 @@ public class TubeGame extends Game {
 		this.background = new Color(45f / 255f, 101f / 255f, 174f / 255f, 1);
 		this.loadAssets();
 		float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
-		gameCamera = new OrthographicCamera();
 
-		viewport = new FitViewport(12f, 12f * aspectRatio, gameCamera);
+		gameCamera = new OrthographicCamera();
+		viewport = new FitViewport(40f, 40f * aspectRatio, gameCamera);
 		viewport.apply();
 		viewport.getCamera().position.set((float) gameCamera.viewportWidth / 2, (float) gameCamera.viewportHeight / 2,
 				0);
 		viewport.getCamera().update();
 
 		uiCamera = new OrthographicCamera();
-		uiViewport = new FitViewport(10f, 10f * aspectRatio, uiCamera);
+		uiViewport = new FitViewport(1000f, 1000f * aspectRatio, uiCamera);
 		uiViewport.apply();
 		uiViewport.getCamera().position.set((float) uiCamera.viewportWidth / 2, (float) uiCamera.viewportHeight / 2, 0);
 		uiViewport.getCamera().update();
@@ -61,6 +61,7 @@ public class TubeGame extends Game {
 		assManager.load("black.png", Texture.class);
 		assManager.load("white.png", Texture.class);
 		assManager.load("tube_title.png", Texture.class);
+		assManager.load("button_background.png", Texture.class);
 		assManager.finishLoading();
 	}
 
@@ -78,6 +79,13 @@ public class TubeGame extends Game {
 
 	@Override
 	public void resize(int width, int height) {
+		viewport.update(width, height);
+		viewport.getCamera().position.set((float) gameCamera.viewportWidth / 2, (float) gameCamera.viewportHeight / 2,
+				0);
+		viewport.getCamera().update();
+		uiViewport.update(width, height);
+		uiViewport.getCamera().position.set((float) uiCamera.viewportWidth / 2, (float) uiCamera.viewportHeight / 2, 0);
+		uiViewport.getCamera().update();
 	}
 
 	@Override

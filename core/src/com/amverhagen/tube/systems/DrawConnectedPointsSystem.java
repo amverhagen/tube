@@ -39,7 +39,7 @@ public class DrawConnectedPointsSystem extends com.artemis.systems.EntityProcess
 		if (state.state == State.RUNNING) {
 			player = world.getManager(TagManager.class).getEntity("PLAYER");
 			playerCenter = centerMapper.get(player);
-			this.renderer.circle(playerCenter.center.x, playerCenter.center.y, .25f, 1000);
+			this.renderer.circle(playerCenter.center.x, playerCenter.center.y, 1f, 500);
 		}
 	}
 

@@ -24,5 +24,4 @@ public class BindSpriteToPositionSystem extends com.artemis.systems.EntityProces
 		Position pos = positionMapper.get(e);
 		sc.sprite.setPosition(pos.x, pos.y);
 	}
-
 }

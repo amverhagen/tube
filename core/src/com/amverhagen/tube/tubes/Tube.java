@@ -57,15 +57,15 @@ public class Tube {
 		switch (type) {
 		case SHORT:
 			if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-				return new Vector2(1.25f, 6);
+				return new Vector2(5f, 24);
 			} else if (direction == Direction.EAST || direction == Direction.WEST) {
-				return new Vector2(6, 1.25f);
+				return new Vector2(24, 5f);
 			}
 			break;
 		default:
-			return new Vector2(1.25f, 1.25f);
+			return new Vector2(5f, 5f);
 		}
-		return new Vector2(1, 1);
+		return new Vector2(5, 5);
 	}
 
 	private void setPositionFromConnectingTube(Tube connectingTube) {

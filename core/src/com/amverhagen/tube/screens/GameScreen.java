@@ -93,12 +93,12 @@ public class GameScreen implements Screen {
 	private void createPlayer() {
 		player = world.createEntity();
 		Deletable dc = new Deletable(false);
-		Position position = new Position(.25f, .25f);
-		RenderBody renderBody = new RenderBody(.5f, .5f);
-		PhysicsBody physicsBody = new PhysicsBody(.5f, .5f);
+		Position position = new Position(1f, 1f);
+		RenderBody renderBody = new RenderBody(2f, 2f);
+		PhysicsBody physicsBody = new PhysicsBody(2f, 2f);
 		Center center = new Center(position, renderBody);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
-		MovementSpeed speedComp = new MovementSpeed(8f);
+		MovementSpeed speedComp = new MovementSpeed(32f);
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
 		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
@@ -114,7 +114,7 @@ public class GameScreen implements Screen {
 	public void createBackground() {
 		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setBounds(0, 0, 10, 10);
+		black.setBounds(0, 0, 1000, 1000);
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();
 		e.edit().add(sc).add(dtfc);
