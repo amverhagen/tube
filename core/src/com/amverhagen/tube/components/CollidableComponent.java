@@ -8,6 +8,6 @@ public class CollidableComponent extends com.artemis.Component {
 	}
 
 	public enum CollisionType {
-		PLAYER, ORB, WALL
+		PLAYER, ORB, WALL, POINT
 	}
 }

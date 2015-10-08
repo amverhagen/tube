@@ -1,11 +1,12 @@
 package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.CollidableComponent;
-import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
-import com.amverhagen.tube.managers.TubeManager;
+import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
+import com.amverhagen.tube.game.Score;
+import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -28,11 +29,13 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 	private PhysicsBody playerBounds;
 	private Deletable playerDeletion;
 	private ScreenState state;
+	private Score score;
 
 	@SuppressWarnings("unchecked")
-	public CheckPlayerCollisionSystem(ScreenState state) {
+	public CheckPlayerCollisionSystem(ScreenState state, Score score) {
 		super(Aspect.all(CollidableComponent.class, PhysicsBody.class, Position.class));
 		this.state = state;
+		this.score = score;
 	}
 
 	@Override
@@ -61,7 +64,9 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 	}
 
 	private void handleCollision(CollidableComponent.CollisionType ct, Entity e) {
-		if (ct == CollisionType.ORB) {
+		if (ct == CollisionType.POINT)
+			score.incrementScore();
+		if (ct == CollisionType.ORB || ct == CollisionType.POINT) {
 			Deletable d = deleteMapper.get(e);
 			d.needsDeleted = true;
 			world.getManager(TubeManager.class).addTube();

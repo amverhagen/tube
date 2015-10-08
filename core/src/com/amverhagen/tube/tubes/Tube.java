@@ -24,7 +24,7 @@ public class Tube {
 	public static float TUBE_LENGTH = TUBE_WIDTH * 4;
 	private Vector2 position;
 	private Vector2 bounds;
-	private Type type;
+	public Type type;
 	private ArrayList<Direction> boundingWalls;
 	private Direction direction;
 

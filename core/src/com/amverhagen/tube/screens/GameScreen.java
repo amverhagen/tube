@@ -6,6 +6,7 @@ import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.DisplayScore;
 import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.MovementDirection;
@@ -16,15 +17,19 @@ import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.SpriteComponent;
+import com.amverhagen.tube.components.Text;
+import com.amverhagen.tube.game.Score;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
+import com.amverhagen.tube.systems.BindScoreToLabelSystem;
 import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DeleteChildEntitySystem;
 import com.amverhagen.tube.systems.DeleteEntitySystem;
 import com.amverhagen.tube.systems.DrawConnectedPointsSystem;
+import com.amverhagen.tube.systems.DrawTextSystem;
 import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
@@ -48,6 +53,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
@@ -63,6 +69,7 @@ public class GameScreen implements Screen {
 	private Entity player;
 	private Entity fade;
 	private TubeManager tubeManager;
+	private Score currentScore;
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
@@ -79,9 +86,11 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
+		worldConfig.setSystem(new DrawTextSystem(game.gameBatch));
 		worldConfig.setSystem(new RenderBoxSystem(game.shapeRenderer));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
-		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
+		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState, currentScore));
+		worldConfig.setSystem(new BindScoreToLabelSystem());
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
@@ -115,6 +124,13 @@ public class GameScreen implements Screen {
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
+	public void createPointLabel() {
+		Entity title = world.createEntity();
+		DisplayScore ds = new DisplayScore(this.currentScore);
+		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .90f, TubeGame.GAME_HEIGHT * .1f), 48);
+		title.edit().add(t).add(ds);
+	}
+
 	public void createBackground() {
 		fade = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
@@ -146,10 +162,12 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
+		this.currentScore = new Score();
 		this.gameState = new ScreenState(State.PAUSED);
 		this.tubeManager = new TubeManager(this.game);
 		createWorld();
 		createPlayer();
+		createPointLabel();
 		createBackground();
 		tubeManager.start();
 		this.fadeIn();
