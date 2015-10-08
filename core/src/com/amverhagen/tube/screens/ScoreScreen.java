@@ -49,36 +49,39 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 		wc.setSystem(new FadeSystem(screenState, tweenManager));
 		wc.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		wc.setSystem(new DrawToForegroundSystem(game.gameBatch));
-		wc.setSystem(new UiClickSystem(game.uiCamera, screenState));
+		wc.setSystem(new UiClickSystem(game.uiViewport, screenState));
 		world = new World(wc);
 	}
 
 	private void createButtons() {
 		Sprite sprite = new Sprite(game.assManager.get("button_background.png", Texture.class));
-		ButtonMaker.createButtonEntity(world, sprite, new Vector2(200, 50f), new Vector2(200, 100), new Event() {
-			@Override
-			public void action() {
-				game.setToMenuScreen();
-			}
-		}, State.RUNNING);
-		ButtonMaker.createButtonEntity(world, sprite, new Vector2(600, 50f), new Vector2(200, 100), new Event() {
-			@Override
-			public void action() {
-				game.setToGameScreen();
-			}
-		}, State.RUNNING);
+		ButtonMaker.createButtonEntity(world, sprite, new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 20f),
+				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 10f), new Event() {
+					@Override
+					public void action() {
+						game.setToMenuScreen();
+					}
+				}, State.RUNNING);
+		ButtonMaker.createButtonEntity(world, sprite, new Vector2(TubeGame.GAME_WIDTH * .6f, TubeGame.GAME_WIDTH / 20f),
+				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 10f), new Event() {
+					@Override
+					public void action() {
+						game.setToGameScreen();
+					}
+				}, State.RUNNING);
 	}
 
 	private void createIcons() {
+		float iconWidth = TubeGame.GAME_WIDTH / 20f;
 		Entity e = world.createEntity();
 		SpriteComponent sc = new SpriteComponent(new Sprite(new Texture(Gdx.files.internal("house.png"))));
-		sc.sprite.setBounds(275f, 75f, 50f, 50f);
+		sc.sprite.setBounds(TubeGame.GAME_WIDTH * .275f, TubeGame.GAME_WIDTH * .075f, iconWidth, iconWidth);
 		DrawToUI dtui = new DrawToUI();
 		e.edit().add(sc).add(dtui);
 
 		e = world.createEntity();
 		sc = new SpriteComponent(new Sprite(new Texture(Gdx.files.internal("replay.png"))));
-		sc.sprite.setBounds(675f, 75f, 50f, 50f);
+		sc.sprite.setBounds(TubeGame.GAME_WIDTH * .675f, TubeGame.GAME_WIDTH * .075f, iconWidth, iconWidth);
 		dtui = new DrawToUI();
 		e.edit().add(sc).add(dtui);
 	}
@@ -124,32 +127,21 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-
 	}
-
 }

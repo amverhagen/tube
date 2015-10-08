@@ -30,11 +30,13 @@ import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
+import com.amverhagen.tube.systems.RenderBoxSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
 import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.systems.UpdateCenterSystem;
+import com.amverhagen.tube.tubes.Tube;
 import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
@@ -72,17 +74,18 @@ public class GameScreen implements Screen {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(BindSpriteToPositionSystem.class);
 		worldConfig.setSystem(new FadeSystem(gameState, tweenManager));
-		worldConfig.setSystem(new UiClickSystem(game.uiCamera, gameState));
+		worldConfig.setSystem(new UiClickSystem(game.uiViewport, gameState));
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
+		worldConfig.setSystem(new RenderBoxSystem(game.shapeRenderer));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
+		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
 		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
 		worldConfig.setSystem(CameraFocusSystem.class);
-		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
 		worldConfig.setSystem(DeleteChildEntitySystem.class);
 		worldConfig.setSystem(DeleteEntitySystem.class);
 		worldConfig.setManager(new TagManager());
@@ -93,16 +96,16 @@ public class GameScreen implements Screen {
 	private void createPlayer() {
 		player = world.createEntity();
 		Deletable dc = new Deletable(false);
-		Position position = new Position(1f, 1f);
-		RenderBody renderBody = new RenderBody(2f, 2f);
-		PhysicsBody physicsBody = new PhysicsBody(2f, 2f);
+		Position position = new Position(100f, 100f);
+		RenderBody renderBody = new RenderBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
+		PhysicsBody physicsBody = new PhysicsBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
 		Center center = new Center(position, renderBody);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
-		MovementSpeed speedComp = new MovementSpeed(32f);
+		MovementSpeed speedComp = new MovementSpeed(750f);
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
-		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
-		DrawShape renderPointsComp = new DrawShape(Color.BLUE, .05f);
+		RecordConnectedPoints recordComp = new RecordConnectedPoints(30);
+		DrawShape renderPointsComp = new DrawShape(Color.BLUE, 5f);
 		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress();
 		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
 		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
@@ -167,8 +170,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		game.viewport.setScreenSize(width, height);
-		game.viewport.apply();
 	}
 
 	@Override
@@ -188,21 +189,3 @@ public class GameScreen implements Screen {
 		world.dispose();
 	}
 }
-
-//
-// private void createLabel() {
-// Entity e = world.createEntity();
-// Position pc = new Position(0, 0);
-// RenderBody ddc = new RenderBody(1f, 1f);
-// SpriteComponent sc = new SpriteComponent(new
-// Sprite(game.assManager.get("white.png", Texture.class)));
-// sc.sprite.setBounds(0, 0, 1f, 1f);
-// DrawToUI dui = new DrawToUI();
-// Clickable cc = new Clickable(State.PAUSED, new Event() {
-// @Override
-// public void action() {
-// show();
-// }
-// });
-// e.edit().add(sc).add(dui).add(pc).add(ddc).add(cc);
-// }

@@ -23,11 +23,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
 
 import aurelienribon.tweenengine.BaseTween;
@@ -41,28 +37,19 @@ public class MainMenuScreen implements Screen {
 	private TubeGame game;
 	private ScreenState state;
 	private World world;
-	private BitmapFont font;
-	private GlyphLayout glyphLayout;
 
 	public MainMenuScreen(TubeGame game) {
 		this.game = game;
 		state = new ScreenState(State.PAUSED);
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/whitrabt.ttf"));
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = 48;
-		font = generator.generateFont(parameter); // font size 12
-		generator.dispose(); // don't forget to dispose to avoid memory leaks!
-		glyphLayout = new GlyphLayout();
-		glyphLayout.setText(font, "Play");
 	}
 
 	public void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(BindSpriteToPositionSystem.class);
 		worldConfig.setSystem(new FadeSystem(state, tweenManager));
-		worldConfig.setSystem(new UiClickSystem(game.uiCamera, state));
+		worldConfig.setSystem(new UiClickSystem(game.uiViewport, state));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
@@ -71,30 +58,34 @@ public class MainMenuScreen implements Screen {
 
 	public void createTitle() {
 		Entity title = world.createEntity();
-		Text t = new Text("Tube", new Vector2(500, 500), 48);
+		Text t = new Text("Tube", new Vector2(TubeGame.GAME_WIDTH / 2f, 500), 48);
 		title.edit().add(t);
 	}
 
 	public void createButtons() {
+		float colorWidth = TubeGame.GAME_WIDTH / 20f;
 		Text text = new Text("Play", new Vector2(0, 0), 48);
 		ButtonMaker.createButtonEntityWithText(world,
-				new Sprite(new Texture(Gdx.files.internal("button_background.png"))), new Vector2(400, 50f),
-				new Vector2(200, 100), new Event() {
+				new Sprite(new Texture(Gdx.files.internal("button_background.png"))),
+				new Vector2(TubeGame.GAME_WIDTH * .4f, colorWidth),
+				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_HEIGHT * .17f), new Event() {
 					@Override
 					public void action() {
 						game.setToGameScreen();
 					}
 				}, State.RUNNING, text);
-		createColorButtonEntity(new Color(45f / 255f, 101f / 255f, 174f / 255f, 1), new Vector2(50f, 50f),
-				new Vector2(50f, 50f));
-		createColorButtonEntity(new Color(0f, 0f, 0f, 1), new Vector2(150f, 50f), new Vector2(50f, 50f));
-		createColorButtonEntity(new Color(1f, .5f, .5f, 1), new Vector2(250f, 50f), new Vector2(50f, 50f));
-		createColorButtonEntity(new Color(9f / 255f, 174f / 255f, 11f / 255f, 1), new Vector2(700f, 50f),
-				new Vector2(50f, 50f));
-		createColorButtonEntity(new Color(99f / 255f, 33f / 255f, 130f / 255f, 1), new Vector2(800f, 50f),
-				new Vector2(50f, 50f));
-		createColorButtonEntity(new Color(209f / 255, 10f / 255f, 10f / 255f, 1), new Vector2(900f, 50f),
-				new Vector2(50f, 50f));
+		createColorButtonEntity(new Color(45f / 255f, 101f / 255f, 174f / 255f, 1), new Vector2(colorWidth, colorWidth),
+				new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(new Color(0f, 0f, 0f, 1), new Vector2(TubeGame.GAME_WIDTH * .15f, colorWidth),
+				new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(new Color(1f, .5f, .5f, 1), new Vector2(TubeGame.GAME_WIDTH * .25f, colorWidth),
+				new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(new Color(9f / 255f, 174f / 255f, 11f / 255f, 1),
+				new Vector2(TubeGame.GAME_WIDTH * .7f, colorWidth), new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(new Color(99f / 255f, 33f / 255f, 130f / 255f, 1),
+				new Vector2(TubeGame.GAME_WIDTH * .8f, colorWidth), new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(new Color(209f / 255, 10f / 255f, 10f / 255f, 1),
+				new Vector2(TubeGame.GAME_WIDTH * .9f, colorWidth), new Vector2(colorWidth, colorWidth));
 	}
 
 	private void createColorButtonEntity(final Color c, Vector2 pos, Vector2 body) {
@@ -150,10 +141,6 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		game.viewport.setScreenSize(width, height);
-		game.viewport.apply();
-		game.uiViewport.setScreenSize(width, height);
-		game.uiViewport.apply();
 	}
 
 	@Override

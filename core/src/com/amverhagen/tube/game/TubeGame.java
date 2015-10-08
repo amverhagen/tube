@@ -4,7 +4,6 @@ import com.amverhagen.tube.screens.GameScreen;
 import com.amverhagen.tube.screens.MainMenuScreen;
 import com.amverhagen.tube.screens.ScoreScreen;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -13,16 +12,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class TubeGame extends Game {
+	public static int GAME_WIDTH = 1600;
+	public static int GAME_HEIGHT = 900;
 	public Color background;
 	public AssetManager assManager;
 	public SpriteBatch gameBatch;
 	public ShapeRenderer shapeRenderer;
 	public Camera gameCamera;
 	public Camera uiCamera;
-	public FitViewport viewport;
-	public FitViewport uiViewport;
+	public Viewport viewport;
+	public Viewport uiViewport;
 	private MainMenuScreen menuScreen;
 	private GameScreen gameScreen;
 	private ScoreScreen scoreScreen;
@@ -31,17 +33,16 @@ public class TubeGame extends Game {
 	public void create() {
 		this.background = new Color(45f / 255f, 101f / 255f, 174f / 255f, 1);
 		this.loadAssets();
-		float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
 
 		gameCamera = new OrthographicCamera();
-		viewport = new FitViewport(40f, 40f * aspectRatio, gameCamera);
+		viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, gameCamera);
 		viewport.apply();
 		viewport.getCamera().position.set((float) gameCamera.viewportWidth / 2, (float) gameCamera.viewportHeight / 2,
 				0);
 		viewport.getCamera().update();
 
 		uiCamera = new OrthographicCamera();
-		uiViewport = new FitViewport(1000f, 1000f * aspectRatio, uiCamera);
+		uiViewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, uiCamera);
 		uiViewport.apply();
 		uiViewport.getCamera().position.set((float) uiCamera.viewportWidth / 2, (float) uiCamera.viewportHeight / 2, 0);
 		uiViewport.getCamera().update();
@@ -80,12 +81,7 @@ public class TubeGame extends Game {
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height);
-		viewport.getCamera().position.set((float) gameCamera.viewportWidth / 2, (float) gameCamera.viewportHeight / 2,
-				0);
-		viewport.getCamera().update();
 		uiViewport.update(width, height);
-		uiViewport.getCamera().position.set((float) uiCamera.viewportWidth / 2, (float) uiCamera.viewportHeight / 2, 0);
-		uiViewport.getCamera().update();
 	}
 
 	@Override

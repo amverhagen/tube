@@ -3,13 +3,16 @@ package com.amverhagen.tube.tubes;
 import java.util.ArrayList;
 
 import com.amverhagen.tube.components.SpriteComponent;
+import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
+import com.amverhagen.tube.components.DrawLineAroundBody;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.HasParent;
 import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
+import com.amverhagen.tube.components.RenderBody;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,6 +20,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
 public class Tube {
+	public static float TUBE_WIDTH = TubeGame.GAME_WIDTH / 8;
+	public static float TUBE_LENGTH = TUBE_WIDTH * 4;
 	private Vector2 position;
 	private Vector2 bounds;
 	private Type type;
@@ -57,15 +62,15 @@ public class Tube {
 		switch (type) {
 		case SHORT:
 			if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-				return new Vector2(5f, 24);
+				return new Vector2(TUBE_WIDTH, TUBE_LENGTH);
 			} else if (direction == Direction.EAST || direction == Direction.WEST) {
-				return new Vector2(24, 5f);
+				return new Vector2(TUBE_LENGTH, TUBE_WIDTH);
 			}
 			break;
 		default:
-			return new Vector2(5f, 5f);
+			return new Vector2(TUBE_WIDTH, TUBE_WIDTH);
 		}
-		return new Vector2(5, 5);
+		return new Vector2(TUBE_WIDTH, TUBE_WIDTH);
 	}
 
 	private void setPositionFromConnectingTube(Tube connectingTube) {
@@ -127,7 +132,7 @@ public class Tube {
 	}
 
 	private void createWalls(World world, Entity parent) {
-		float thickness = 1f;
+		float thickness = 50f;
 		for (Direction d : boundingWalls) {
 			Entity wall = world.createEntity();
 			CollidableComponent cc = new CollidableComponent(CollisionType.WALL);
@@ -148,7 +153,9 @@ public class Tube {
 			}
 			Deletable dc = new Deletable(false);
 			HasParent hp = new HasParent(parent);
-			wall.edit().add(cc).add(pos).add(pb).add(dc).add(hp);
+			RenderBody rd = new RenderBody(new Vector2(pb.width, pb.height));
+			DrawLineAroundBody dlab = new DrawLineAroundBody();
+			wall.edit().add(cc).add(pos).add(pb).add(dc).add(hp).add(rd).add(dlab);
 		}
 	}
 

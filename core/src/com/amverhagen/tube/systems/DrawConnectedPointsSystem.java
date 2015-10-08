@@ -4,6 +4,7 @@ import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RecordConnectedPoints.ConnectedPointList.ConnectedPoint;
 import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.tubes.Tube;
 import com.amverhagen.tube.components.DrawShape;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -36,10 +37,10 @@ public class DrawConnectedPointsSystem extends com.artemis.systems.EntityProcess
 	protected void begin() {
 		this.renderer.begin();
 		this.renderer.set(ShapeType.Filled);
-		if (state.state == State.RUNNING) {
+		if (state.state == State.RUNNING || state.state == State.PAUSED) {
 			player = world.getManager(TagManager.class).getEntity("PLAYER");
 			playerCenter = centerMapper.get(player);
-			this.renderer.circle(playerCenter.center.x, playerCenter.center.y, 1f, 500);
+			this.renderer.circle(playerCenter.center.x, playerCenter.center.y, Tube.TUBE_WIDTH / 5f, 1000);
 		}
 	}
 
