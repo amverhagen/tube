@@ -43,6 +43,10 @@ public class MainMenuScreen implements Screen {
 		state = new ScreenState(State.PAUSED);
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+		createWorld();
+		createTitle();
+		createButtons();
+		createBackground();
 	}
 
 	public void createWorld() {
@@ -66,12 +70,12 @@ public class MainMenuScreen implements Screen {
 		float colorWidth = TubeGame.GAME_WIDTH / 20f;
 		Text text = new Text("Play", new Vector2(0, 0), 48);
 		ButtonMaker.createButtonEntityWithText(world,
-				new Sprite(new Texture(Gdx.files.internal("button_background.png"))),
+				new Sprite(game.assManager.get("button_background.png", Texture.class)),
 				new Vector2(TubeGame.GAME_WIDTH * .4f, colorWidth),
 				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_HEIGHT * .17f), new Event() {
 					@Override
 					public void action() {
-						game.setToGameScreen();
+						fadeOutToGame();
 					}
 				}, State.RUNNING, text);
 		createColorButtonEntity(new Color(45f / 255f, 101f / 255f, 174f / 255f, 1), new Vector2(colorWidth, colorWidth),
@@ -104,7 +108,7 @@ public class MainMenuScreen implements Screen {
 	public void createBackground() {
 		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setBounds(0, 0, 1000, 1000);
+		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();
 		e.edit().add(sc).add(dtfc);
@@ -112,7 +116,7 @@ public class MainMenuScreen implements Screen {
 
 	private void fadeIn() {
 		this.state.state = State.FADING;
-		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager).setCallback(new TweenCallback() {
+		Tween.to(black, SpriteAccessor.ALPHA, .6f).target(0).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
 				state.state = State.RUNNING;
@@ -120,12 +124,18 @@ public class MainMenuScreen implements Screen {
 		});
 	}
 
+	private void fadeOutToGame() {
+		this.state.state = State.FADING;
+		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(1).start(tweenManager).setCallback(new TweenCallback() {
+			@Override
+			public void onEvent(int arg0, BaseTween<?> arg1) {
+				game.setToGameScreen();
+			}
+		});
+	}
+
 	@Override
 	public void show() {
-		createWorld();
-		createTitle();
-		createButtons();
-		createBackground();
 		this.fadeIn();
 	}
 

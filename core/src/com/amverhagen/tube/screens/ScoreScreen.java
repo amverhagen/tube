@@ -59,14 +59,14 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 10f), new Event() {
 					@Override
 					public void action() {
-						game.setToMenuScreen();
+						fadeOutToHome();
 					}
 				}, State.RUNNING);
 		ButtonMaker.createButtonEntity(world, sprite, new Vector2(TubeGame.GAME_WIDTH * .6f, TubeGame.GAME_WIDTH / 20f),
 				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 10f), new Event() {
 					@Override
 					public void action() {
-						game.setToGameScreen();
+						fadeOutToGame();
 					}
 				}, State.RUNNING);
 	}
@@ -89,7 +89,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 	public void createBackground() {
 		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setBounds(0, 0, 1000, 1000);
+		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();
 		e.edit().add(sc).add(dtfc);
@@ -101,6 +101,26 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
 				screenState.state = State.RUNNING;
+			}
+		});
+	}
+
+	private void fadeOutToHome() {
+		this.screenState.state = State.FADING;
+		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(1).start(tweenManager).setCallback(new TweenCallback() {
+			@Override
+			public void onEvent(int arg0, BaseTween<?> arg1) {
+				game.setToMenuScreen();
+			}
+		});
+	}
+
+	private void fadeOutToGame() {
+		this.screenState.state = State.FADING;
+		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(1).start(tweenManager).setCallback(new TweenCallback() {
+			@Override
+			public void onEvent(int arg0, BaseTween<?> arg1) {
+				game.setToGameScreen();
 			}
 		});
 	}

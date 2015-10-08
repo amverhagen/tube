@@ -61,6 +61,7 @@ public class GameScreen implements Screen {
 	private TubeGame game;
 	private World world;
 	private Entity player;
+	private Entity fade;
 	private TubeManager tubeManager;
 
 	public GameScreen(TubeGame game) {
@@ -115,12 +116,12 @@ public class GameScreen implements Screen {
 	}
 
 	public void createBackground() {
-		Entity e = world.createEntity();
+		fade = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setBounds(0, 0, 1000, 1000);
+		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();
-		e.edit().add(sc).add(dtfc);
+		fade.edit().add(sc).add(dtfc);
 	}
 
 	private void fadeIn() {

@@ -4,12 +4,14 @@ import com.amverhagen.tube.screens.GameScreen;
 import com.amverhagen.tube.screens.MainMenuScreen;
 import com.amverhagen.tube.screens.ScoreScreen;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -17,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class TubeGame extends Game {
 	public static int GAME_WIDTH = 1600;
 	public static int GAME_HEIGHT = 900;
+	public static FreeTypeFontGenerator fontGenerator;
 	public Color background;
 	public AssetManager assManager;
 	public SpriteBatch gameBatch;
@@ -31,7 +34,6 @@ public class TubeGame extends Game {
 
 	@Override
 	public void create() {
-		this.background = new Color(45f / 255f, 101f / 255f, 174f / 255f, 1);
 		this.loadAssets();
 
 		gameCamera = new OrthographicCamera();
@@ -58,12 +60,14 @@ public class TubeGame extends Game {
 	}
 
 	private void loadAssets() {
+		fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/whitrabt.ttf"));
 		assManager = new AssetManager();
 		assManager.load("black.png", Texture.class);
 		assManager.load("white.png", Texture.class);
 		assManager.load("tube_title.png", Texture.class);
 		assManager.load("button_background.png", Texture.class);
 		assManager.finishLoading();
+		this.background = new Color(45f / 255f, 101f / 255f, 174f / 255f, 1);
 	}
 
 	public void setToMenuScreen() {
@@ -91,6 +95,7 @@ public class TubeGame extends Game {
 
 	@Override
 	public void dispose() {
+		fontGenerator.dispose();
 		assManager.dispose();
 		menuScreen.dispose();
 		gameScreen.dispose();
