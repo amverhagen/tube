@@ -1,6 +1,7 @@
 package com.amverhagen.tube.screens;
 
 import com.amverhagen.tube.components.Clickable.Event;
+import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
@@ -8,6 +9,7 @@ import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.DrawTextSystem;
+import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
@@ -33,7 +35,8 @@ import aurelienribon.tweenengine.TweenManager;
 
 public class MainMenuScreen implements Screen {
 	private TweenManager tweenManager;
-	private Sprite black;
+	private Sprite fgSprite;
+	private Sprite bgSprite;
 	private TubeGame game;
 	private ScreenState state;
 	private World world;
@@ -46,18 +49,29 @@ public class MainMenuScreen implements Screen {
 		createWorld();
 		createTitle();
 		createButtons();
-		createBackground();
+		createForeground();
 	}
 
 	public void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
 		worldConfig.setSystem(BindSpriteToPositionSystem.class);
 		worldConfig.setSystem(new FadeSystem(state, tweenManager));
+		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, state));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		world = new World(worldConfig);
+	}
+
+	private void createBackground() {
+		Entity bg = world.createEntity();
+		bgSprite = new Sprite(game.assManager.get("white.png", Texture.class));
+		SpriteComponent sc = new SpriteComponent(bgSprite);
+		sc.sprite.setBounds(0, 0, TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
+		sc.sprite.setColor(game.background);
+		DrawToBackground dtb = new DrawToBackground();
+		bg.edit().add(sc).add(dtb);
 	}
 
 	public void createTitle() {
@@ -100,23 +114,24 @@ public class MainMenuScreen implements Screen {
 			public void action() {
 				game.background = new Color(c.r, c.g, c.b, 1);
 				game.shapeRenderer.setColor(game.background);
+				bgSprite.setColor(game.background);
 			}
 		};
 		ButtonMaker.createButtonEntity(world, sprite, pos, body, event, State.RUNNING);
 	}
 
-	public void createBackground() {
+	public void createForeground() {
 		Entity e = world.createEntity();
-		black = new Sprite(game.assManager.get("black.png", Texture.class));
-		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
-		SpriteComponent sc = new SpriteComponent(black);
+		fgSprite = new Sprite(game.assManager.get("black.png", Texture.class));
+		fgSprite.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
+		SpriteComponent sc = new SpriteComponent(fgSprite);
 		DrawToForeground dtfc = new DrawToForeground();
 		e.edit().add(sc).add(dtfc);
 	}
 
 	private void fadeIn() {
 		this.state.state = State.FADING;
-		Tween.to(black, SpriteAccessor.ALPHA, .6f).target(0).start(tweenManager).setCallback(new TweenCallback() {
+		Tween.to(fgSprite, SpriteAccessor.ALPHA, .6f).target(0).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
 				state.state = State.RUNNING;
@@ -126,7 +141,7 @@ public class MainMenuScreen implements Screen {
 
 	private void fadeOutToGame() {
 		this.state.state = State.FADING;
-		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(1).start(tweenManager).setCallback(new TweenCallback() {
+		Tween.to(fgSprite, SpriteAccessor.ALPHA, .5f).target(1).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
 				game.setToGameScreen();
@@ -136,6 +151,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
+		this.createBackground();
 		this.fadeIn();
 	}
 
@@ -143,7 +159,7 @@ public class MainMenuScreen implements Screen {
 	public void render(float delta) {
 		if (delta > .1)
 			delta = .1f;
-		Gdx.gl.glClearColor(game.background.r, game.background.g, game.background.b, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		world.setDelta(delta);
 		world.process();

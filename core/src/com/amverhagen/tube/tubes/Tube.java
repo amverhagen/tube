@@ -8,7 +8,7 @@ import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DrawLineAroundBody;
-import com.amverhagen.tube.components.DrawToBackground;
+import com.amverhagen.tube.components.DrawToGame;
 import com.amverhagen.tube.components.HasParent;
 import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
@@ -125,8 +125,8 @@ public class Tube {
 		Position pc = new Position(this.position);
 		sc.sprite.setBounds(pc.x, pc.y, this.bounds.x, this.bounds.y);
 		Deletable dc = new Deletable(false);
-		DrawToBackground dtb = new DrawToBackground();
-		tube.edit().add(sc).add(dc).add(pc).add(dtb);
+		DrawToGame dtg = new DrawToGame();
+		tube.edit().add(sc).add(dc).add(pc).add(dtg);
 		this.createWalls(world, tube);
 		return tube;
 	}

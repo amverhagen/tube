@@ -1,6 +1,7 @@
 package com.amverhagen.tube.components;
 
 import com.amverhagen.tube.game.TubeGame;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
@@ -16,6 +17,8 @@ public class Text extends com.artemis.Component {
 		this.text = text;
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
+		parameter.borderWidth = 3;
+		parameter.borderColor = Color.GREEN;
 		font = TubeGame.fontGenerator.generateFont(parameter);
 		setCenter(center);
 	}

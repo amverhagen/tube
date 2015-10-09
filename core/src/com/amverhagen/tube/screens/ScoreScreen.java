@@ -1,5 +1,6 @@
 package com.amverhagen.tube.screens;
 
+import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.components.SpriteComponent;
@@ -7,6 +8,7 @@ import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
+import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
@@ -47,10 +49,21 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 		WorldConfiguration wc = new WorldConfiguration();
 		wc.setSystem(BindSpriteToPositionSystem.class);
 		wc.setSystem(new FadeSystem(screenState, tweenManager));
+		wc.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
 		wc.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		wc.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		wc.setSystem(new UiClickSystem(game.uiViewport, screenState));
 		world = new World(wc);
+	}
+
+	private void createBackground() {
+		Entity bg = world.createEntity();
+		Sprite bgs = new Sprite(game.assManager.get("white.png", Texture.class));
+		SpriteComponent sc = new SpriteComponent(bgs);
+		sc.sprite.setBounds(0, 0, TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
+		sc.sprite.setColor(game.background);
+		DrawToBackground dtb = new DrawToBackground();
+		bg.edit().add(sc).add(dtb);
 	}
 
 	private void createButtons() {
@@ -86,7 +99,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 		e.edit().add(sc).add(dtui);
 	}
 
-	public void createBackground() {
+	public void createForeground() {
 		Entity e = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
 		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
@@ -128,15 +141,16 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 	@Override
 	public void show() {
 		createWorld();
-		createButtons();
 		createBackground();
+		createButtons();
+		createForeground();
 		createIcons();
 		this.fadeIn();
 	}
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(game.background.r, game.background.g, game.background.b, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		if (delta > .1f) {
 			delta = .1f;

@@ -8,6 +8,7 @@ import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DisplayScore;
 import com.amverhagen.tube.components.DrawShape;
+import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
@@ -23,7 +24,6 @@ import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
 import com.amverhagen.tube.systems.BindScoreToLabelSystem;
-import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DeleteChildEntitySystem;
@@ -32,6 +32,7 @@ import com.amverhagen.tube.systems.DrawConnectedPointsSystem;
 import com.amverhagen.tube.systems.DrawTextSystem;
 import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
+import com.amverhagen.tube.systems.DrawToGameSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
 import com.amverhagen.tube.systems.MoveInDirectionSystem;
@@ -80,10 +81,10 @@ public class GameScreen implements Screen {
 
 	private void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
-		worldConfig.setSystem(BindSpriteToPositionSystem.class);
 		worldConfig.setSystem(new FadeSystem(gameState, tweenManager));
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, gameState));
-		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch));
+		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
+		worldConfig.setSystem(new DrawToGameSystem(game.gameBatch, game.gameCamera));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch));
@@ -124,14 +125,24 @@ public class GameScreen implements Screen {
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
-	public void createPointLabel() {
+	private void createPointLabel() {
 		Entity title = world.createEntity();
 		DisplayScore ds = new DisplayScore(this.currentScore);
-		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .90f, TubeGame.GAME_HEIGHT * .1f), 48);
+		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .1f, TubeGame.GAME_HEIGHT * .9f), 48);
 		title.edit().add(t).add(ds);
 	}
 
-	public void createBackground() {
+	private void createBackground() {
+		Entity bg = world.createEntity();
+		Sprite bgs = new Sprite(game.assManager.get("white.png", Texture.class));
+		SpriteComponent sc = new SpriteComponent(bgs);
+		sc.sprite.setBounds(0, 0, TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
+		sc.sprite.setColor(game.background);
+		DrawToBackground dtb = new DrawToBackground();
+		bg.edit().add(sc).add(dtb);
+	}
+
+	private void createForeground() {
 		fade = world.createEntity();
 		black = new Sprite(game.assManager.get("black.png", Texture.class));
 		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
@@ -166,18 +177,19 @@ public class GameScreen implements Screen {
 		this.gameState = new ScreenState(State.PAUSED);
 		this.tubeManager = new TubeManager(this.game);
 		createWorld();
+		createBackground();
 		createPlayer();
 		createPointLabel();
-		createBackground();
+		createForeground();
 		tubeManager.start();
 		this.fadeIn();
 	}
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(game.background.r, game.background.g, game.background.b, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		game.gameBatch.setProjectionMatrix(game.viewport.getCamera().combined);
+
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
 		if (delta > .1f)
 			delta = .1f;

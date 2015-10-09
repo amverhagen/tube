@@ -1,6 +1,6 @@
 package com.amverhagen.tube.systems;
 
-import com.amverhagen.tube.components.DrawToBackground;
+import com.amverhagen.tube.components.DrawToGame;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -9,22 +9,22 @@ import com.artemis.annotations.Wire;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class DrawToBackgroundSystem extends com.artemis.systems.EntityProcessingSystem {
+public class DrawToGameSystem extends com.artemis.systems.EntityProcessingSystem {
 	private SpriteBatch batch;
-	private Camera backgroundCam;
+	private Camera gameCamera;
 	@Wire
 	ComponentMapper<SpriteComponent> spriteMapper;
 
 	@SuppressWarnings("unchecked")
-	public DrawToBackgroundSystem(SpriteBatch batch, Camera backgroundCam) {
-		super(Aspect.all(DrawToBackground.class, SpriteComponent.class));
+	public DrawToGameSystem(SpriteBatch batch, Camera gameCamera) {
+		super(Aspect.all(DrawToGame.class, SpriteComponent.class));
 		this.batch = batch;
-		this.backgroundCam = backgroundCam;
+		this.gameCamera = gameCamera;
 	}
 
 	@Override
 	protected void begin() {
-		this.batch.setProjectionMatrix(backgroundCam.combined);
+		this.batch.setProjectionMatrix(gameCamera.combined);
 		this.batch.begin();
 	}
 
@@ -38,4 +38,5 @@ public class DrawToBackgroundSystem extends com.artemis.systems.EntityProcessing
 	protected void end() {
 		this.batch.end();
 	}
+
 }
