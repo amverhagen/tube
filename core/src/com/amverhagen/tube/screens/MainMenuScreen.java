@@ -59,7 +59,7 @@ public class MainMenuScreen implements Screen {
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, state));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
-		worldConfig.setSystem(new DrawTextSystem(game.gameBatch));
+		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.state));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		world = new World(worldConfig);
 	}
@@ -76,7 +76,7 @@ public class MainMenuScreen implements Screen {
 
 	public void createTitle() {
 		Entity title = world.createEntity();
-		Text t = new Text("Tube", new Vector2(TubeGame.GAME_WIDTH / 2f, 500), 48);
+		Text t = new Text("Tube", new Vector2(TubeGame.GAME_WIDTH / 2f, TubeGame.GAME_HEIGHT * .75f), 60);
 		title.edit().add(t);
 	}
 

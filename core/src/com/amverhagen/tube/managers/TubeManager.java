@@ -20,6 +20,7 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 	private LinkedListQueue<Entity> activeTubes;
 	private Tube lastTube;
 	private TubeGame game;
+	public Vector2 startingPoint;
 
 	public TubeManager(TubeGame game) {
 		this.game = game;
@@ -38,6 +39,7 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 			lastTube = new Tube(new Vector2(0, 0), Type.SHORT, Direction.EAST);
 			Entity tube = lastTube.returnAsEntity(world, game.assManager.get("white.png", Texture.class));
 			activeTubes.enqueue(tube);
+			startingPoint = lastTube.getCenter();
 		} else {
 			if (activeTubes.size() >= 7) {
 				activeTubes.dequeue().deleteFromWorld();

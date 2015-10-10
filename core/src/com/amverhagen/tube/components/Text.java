@@ -17,15 +17,23 @@ public class Text extends com.artemis.Component {
 		this.text = text;
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
+		font = TubeGame.fontGenerator.generateFont(parameter);
+		setCenter(center);
+	}
+
+	public Text(String text, Vector2 center, int size, Color c) {
+		this.text = text;
+		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+		parameter.size = size;
 		parameter.borderWidth = 3;
-		parameter.borderColor = Color.GREEN;
+		parameter.borderColor = c;
 		font = TubeGame.fontGenerator.generateFont(parameter);
 		setCenter(center);
 	}
 
 	public void setCenter(Vector2 center) {
 		GlyphLayout glyphLayout = new GlyphLayout();
-		glyphLayout.setText(font, "Play");
+		glyphLayout.setText(font, text);
 		xPos = center.x - glyphLayout.width / 2;
 		yPos = center.y + glyphLayout.height / 2;
 	}

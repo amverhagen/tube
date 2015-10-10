@@ -3,10 +3,13 @@ package com.amverhagen.tube.screens;
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
+import com.amverhagen.tube.components.Clickable;
+import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.components.CollidableComponent;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DisplayScore;
+import com.amverhagen.tube.components.DrawDuringState;
 import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
@@ -16,7 +19,6 @@ import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderBody;
-import com.amverhagen.tube.components.SetMoveDirectionBasedOnRightOrLeftPress;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
 import com.amverhagen.tube.game.Score;
@@ -39,7 +41,6 @@ import com.amverhagen.tube.systems.MoveInDirectionSystem;
 import com.amverhagen.tube.systems.RenderBoxSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
-import com.amverhagen.tube.systems.ShiftDirectionLeftOrRightByPressSystem;
 import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.systems.UpdateCenterSystem;
 import com.amverhagen.tube.tubes.Tube;
@@ -50,7 +51,6 @@ import com.artemis.WorldConfiguration;
 import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -63,6 +63,7 @@ import aurelienribon.tweenengine.TweenManager;
 
 public class GameScreen implements Screen {
 	private ScreenState gameState;
+	private ScreenState pastState;
 	private TweenManager tweenManager;
 	private Sprite black;
 	private TubeGame game;
@@ -87,7 +88,7 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(new DrawToGameSystem(game.gameBatch, game.gameCamera));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
-		worldConfig.setSystem(new DrawTextSystem(game.gameBatch));
+		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.gameState));
 		worldConfig.setSystem(new RenderBoxSystem(game.shapeRenderer));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
 		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState, currentScore));
@@ -95,7 +96,6 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
 		worldConfig.setSystem(AddConnectedPointsFromEntityCenterSystem.class);
-		worldConfig.setSystem(new ShiftDirectionLeftOrRightByPressSystem(gameState));
 		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(DeleteChildEntitySystem.class);
 		worldConfig.setSystem(DeleteEntitySystem.class);
@@ -107,29 +107,72 @@ public class GameScreen implements Screen {
 	private void createPlayer() {
 		player = world.createEntity();
 		Deletable dc = new Deletable(false);
-		Position position = new Position(100f, 100f);
 		RenderBody renderBody = new RenderBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
 		PhysicsBody physicsBody = new PhysicsBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
+		Position position = new Position(tubeManager.startingPoint.x - renderBody.width / 2,
+				tubeManager.startingPoint.y - renderBody.height / 2);
 		Center center = new Center(position, renderBody);
 		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
-		MovementSpeed speedComp = new MovementSpeed(750f);
+		MovementSpeed speedComp = new MovementSpeed(950f);
 		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
-		RecordConnectedPoints recordComp = new RecordConnectedPoints(30);
-		DrawShape renderPointsComp = new DrawShape(Color.BLUE, 5f);
-		SetMoveDirectionBasedOnRightOrLeftPress setDirectionComp = new SetMoveDirectionBasedOnRightOrLeftPress();
+		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
+		DrawShape renderPointsComp = new DrawShape(game.background, 5f);
 		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
 		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
-				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(setDirectionComp).add(crc)
-				.add(dc);
+				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(crc).add(dc);
 		world.getManager(TagManager.class).register("PLAYER", player);
+		createLeftClickPanel();
+		createRightClickPanel();
+	}
+
+	private void createLeftClickPanel() {
+		Entity leftClick = world.createEntity();
+		Position pos = new Position(0, 0);
+		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH / 2, TubeGame.GAME_HEIGHT);
+		Clickable cl = new Clickable(State.RUNNING, new Event() {
+			@Override
+			public void action() {
+				player.getComponent(MovementDirection.class).shiftDirectionLeft();
+			}
+		}, true);
+		leftClick.edit().add(pos).add(rd).add(cl);
+	}
+
+	private void createRightClickPanel() {
+		Entity rightClick = world.createEntity();
+		Position pos = new Position(TubeGame.GAME_WIDTH / 2, 0);
+		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH / 2, TubeGame.GAME_HEIGHT);
+		Clickable cl = new Clickable(State.RUNNING, new Event() {
+			@Override
+			public void action() {
+				player.getComponent(MovementDirection.class).shiftDirectionRight();
+			}
+		}, true);
+		rightClick.edit().add(pos).add(rd).add(cl);
 	}
 
 	private void createPointLabel() {
 		Entity title = world.createEntity();
 		DisplayScore ds = new DisplayScore(this.currentScore);
-		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .1f, TubeGame.GAME_HEIGHT * .9f), 48);
+		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f), 48, game.background);
 		title.edit().add(t).add(ds);
+	}
+
+	private void createPauseLabel() {
+		Entity label = world.createEntity();
+		Text t = new Text("Game Ready Tap to Begin",
+				new Vector2(TubeGame.GAME_WIDTH * .5f, TubeGame.GAME_HEIGHT * .75f), 60, game.background);
+		DrawDuringState dds = new DrawDuringState(new ScreenState(State.PAUSED));
+		Position pos = new Position(0, 0);
+		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
+		Clickable cl = new Clickable(State.PAUSED, new Event() {
+			@Override
+			public void action() {
+				gameState.state = State.RUNNING;
+			}
+		}, false);
+		label.edit().add(t).add(dds).add(pos).add(rd).add(cl);
 	}
 
 	private void createBackground() {
@@ -156,7 +199,7 @@ public class GameScreen implements Screen {
 		Tween.to(black, SpriteAccessor.ALPHA, .5f).target(0).start(tweenManager).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int arg0, BaseTween<?> arg1) {
-				gameState.state = State.RUNNING;
+				gameState.state = State.PAUSED;
 			}
 		});
 	}
@@ -175,13 +218,15 @@ public class GameScreen implements Screen {
 	public void show() {
 		this.currentScore = new Score();
 		this.gameState = new ScreenState(State.PAUSED);
+		this.pastState = new ScreenState(State.PAUSED);
 		this.tubeManager = new TubeManager(this.game);
 		createWorld();
+		tubeManager.start();
 		createBackground();
 		createPlayer();
 		createPointLabel();
+		createPauseLabel();
 		createForeground();
-		tubeManager.start();
 		this.fadeIn();
 	}
 
@@ -205,10 +250,14 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void pause() {
+		pastState.state = gameState.state;
+		gameState.state = State.PAUSED;
 	}
 
 	@Override
 	public void resume() {
+		if (pastState.state == State.FADING)
+			gameState.state = State.FADING;
 	}
 
 	@Override

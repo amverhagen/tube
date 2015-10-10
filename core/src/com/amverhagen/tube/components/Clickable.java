@@ -5,10 +5,12 @@ import com.amverhagen.tube.systems.ScreenState.State;
 public class Clickable extends com.artemis.Component {
 	public Event event;
 	public State actionState;
+	public boolean onGCD;
 
-	public Clickable(State state, Event event) {
+	public Clickable(State state, Event event, boolean onDelay) {
 		this.actionState = state;
 		this.event = event;
+		this.onGCD = onDelay;
 	}
 
 	public interface Event {

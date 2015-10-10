@@ -23,7 +23,7 @@ public class ButtonMaker {
 		RenderBody ddc = new RenderBody(body);
 		SpriteComponent sc = new SpriteComponent(new Sprite(sprite));
 		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
-		Clickable cc = new Clickable(state, event);
+		Clickable cc = new Clickable(state, event, false);
 		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc);
 	}
 
@@ -35,7 +35,7 @@ public class ButtonMaker {
 		RenderBody ddc = new RenderBody(body);
 		SpriteComponent sc = new SpriteComponent(new Sprite(sprite));
 		sc.sprite.setBounds(pc.x, pc.y, ddc.width, ddc.height);
-		Clickable cc = new Clickable(state, event);
+		Clickable cc = new Clickable(state, event, false);
 		text.setCenter(new Vector2((pc.x + ddc.width / 2), (pc.y + ddc.height / 2)));
 		e.edit().add(uic).add(cc).add(sc).add(pc).add(ddc).add(text);
 	}
