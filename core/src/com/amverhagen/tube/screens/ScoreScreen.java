@@ -1,10 +1,10 @@
 package com.amverhagen.tube.screens;
 
+import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.components.SpriteComponent;
-import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
@@ -14,13 +14,12 @@ import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
 import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
-import com.amverhagen.tube.tween.SpriteAccessor;
 import com.amverhagen.tube.systems.UiClickSystem;
+import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -150,8 +149,6 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		if (delta > .1f) {
 			delta = .1f;
 		}

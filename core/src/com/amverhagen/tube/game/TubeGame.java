@@ -8,10 +8,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class TubeGame extends Game {
 	public static int GAME_WIDTH = 1600;
 	public static int GAME_HEIGHT = 900;
-	public static FreeTypeFontGenerator fontGenerator;
+	public boolean tutorialOn;
 	public Color background;
 	public AssetManager assManager;
 	public SpriteBatch gameBatch;
@@ -28,6 +28,7 @@ public class TubeGame extends Game {
 	public Camera uiCamera;
 	public Viewport viewport;
 	public Viewport uiViewport;
+	public Fonts fonts;
 	private MainMenuScreen menuScreen;
 	private GameScreen gameScreen;
 	private ScoreScreen scoreScreen;
@@ -60,14 +61,16 @@ public class TubeGame extends Game {
 	}
 
 	private void loadAssets() {
-		fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/whitrabt.ttf"));
+		fonts = new Fonts();
 		assManager = new AssetManager();
 		assManager.load("black.png", Texture.class);
 		assManager.load("white.png", Texture.class);
+		assManager.load("replay.png", Texture.class);
+		assManager.load("house.png", Texture.class);
 		assManager.load("tube_title.png", Texture.class);
 		assManager.load("button_background.png", Texture.class);
 		assManager.finishLoading();
-		this.background = new Color(45f / 255f, 101f / 255f, 174f / 255f, 1);
+		this.background = Colors.TUBE_BLUE;
 	}
 
 	public void setToMenuScreen() {
@@ -90,12 +93,13 @@ public class TubeGame extends Game {
 
 	@Override
 	public void render() {
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		super.render();
 	}
 
 	@Override
 	public void dispose() {
-		fontGenerator.dispose();
 		assManager.dispose();
 		menuScreen.dispose();
 		gameScreen.dispose();

@@ -5,14 +5,13 @@ import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.Clickable.Event;
-import com.amverhagen.tube.components.CollidableComponent;
-import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DisplayScore;
 import com.amverhagen.tube.components.DrawDuringState;
 import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
+import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.PhysicsBody;
@@ -21,6 +20,7 @@ import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
+import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.Score;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.TubeManager;
@@ -49,9 +49,7 @@ import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
 import com.artemis.managers.TagManager;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -75,9 +73,9 @@ public class GameScreen implements Screen {
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
-		this.world = new World();
 		this.tweenManager = new TweenManager();
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+
 	}
 
 	private void createWorld() {
@@ -118,51 +116,102 @@ public class GameScreen implements Screen {
 		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
 		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
 		DrawShape renderPointsComp = new DrawShape(game.background, 5f);
-		CollidableComponent crc = new CollidableComponent(CollisionType.PLAYER);
 		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
-				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(crc).add(dc);
+				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(dc);
 		world.getManager(TagManager.class).register("PLAYER", player);
-		createLeftClickPanel();
-		createRightClickPanel();
 	}
 
 	private void createLeftClickPanel() {
-		Entity leftClick = world.createEntity();
-		Position pos = new Position(0, 0);
-		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH / 2, TubeGame.GAME_HEIGHT);
-		Clickable cl = new Clickable(State.RUNNING, new Event() {
+		Event e = new Event() {
 			@Override
 			public void action() {
 				player.getComponent(MovementDirection.class).shiftDirectionLeft();
 			}
-		}, true);
-		leftClick.edit().add(pos).add(rd).add(cl);
+		};
+		Entity leftClick = world.createEntity();
+		Position pos = new Position(0, 0);
+		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH / 2, TubeGame.GAME_HEIGHT);
+		Text t = new Text("    Press left side to\nrotate counter-clockwise",
+				new Vector2(TubeGame.GAME_WIDTH * .25f, TubeGame.GAME_HEIGHT * .75f),
+				game.fonts.getFont(game.background, 48));
+		Sprite white = new Sprite(game.assManager.get("white.png", Texture.class));
+		white.setBounds(0, 0, rd.width, rd.height);
+		white.setAlpha(.3f);
+		SpriteComponent sc = new SpriteComponent(white);
+		DrawToUI dtui = new DrawToUI();
+		Clickable cl = new Clickable(State.RUNNING, e, true);
+		leftClick.edit().add(pos).add(rd).add(cl).add(t).add(sc).add(dtui);
+
+		Entity icon = world.createEntity();
+		RenderBody iconBody = new RenderBody(TubeGame.GAME_WIDTH * .10f, TubeGame.GAME_WIDTH * .10f);
+		Position iconPos = new Position((TubeGame.GAME_WIDTH * .25f) - iconBody.width / 2, TubeGame.GAME_HEIGHT * .4f);
+		Sprite iconSprite = new Sprite(game.assManager.get("replay.png", Texture.class));
+		iconSprite.setColor(game.background);
+		iconSprite.flip(true, false);
+		iconSprite.setBounds(iconPos.x, iconPos.y, iconBody.width, iconBody.height);
+		SpriteComponent iconSC = new SpriteComponent(iconSprite);
+		icon.edit().add(dtui).add(iconBody).add(iconPos).add(iconSC);
+
+		Vector2 buttonBody = new Vector2(TubeGame.GAME_WIDTH * .10f, TubeGame.GAME_HEIGHT * .10f);
+		Vector2 buttonPos = new Vector2((TubeGame.GAME_WIDTH * .25f) - buttonBody.x / 2f, TubeGame.GAME_HEIGHT * .25f);
+		Sprite buttonSprite = new Sprite(game.assManager.get("button_background.png", Texture.class));
+		buttonSprite.setColor(game.background);
+		ButtonMaker.createButtonEntityWithText(world, buttonSprite, buttonPos, buttonBody, e, State.PAUSED,
+				new Text("Ok", new Vector2(0, 0), game.fonts.getFont(game.background, 48)));
 	}
 
 	private void createRightClickPanel() {
-		Entity rightClick = world.createEntity();
-		Position pos = new Position(TubeGame.GAME_WIDTH / 2, 0);
-		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH / 2, TubeGame.GAME_HEIGHT);
-		Clickable cl = new Clickable(State.RUNNING, new Event() {
+		Event e = new Event() {
 			@Override
 			public void action() {
 				player.getComponent(MovementDirection.class).shiftDirectionRight();
 			}
-		}, true);
-		rightClick.edit().add(pos).add(rd).add(cl);
+		};
+		Entity rightClick = world.createEntity();
+		Position pos = new Position(TubeGame.GAME_WIDTH / 2, 0);
+		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH / 2, TubeGame.GAME_HEIGHT);
+		Text t = new Text("  Press right side\nto rotate clockwise",
+				new Vector2(TubeGame.GAME_WIDTH * .75f, TubeGame.GAME_HEIGHT * .75f),
+				game.fonts.getFont(game.background, 48));
+		Sprite white = new Sprite(game.assManager.get("white.png", Texture.class));
+		white.setBounds(TubeGame.GAME_WIDTH / 2f, 0, rd.width, rd.height);
+		white.setAlpha(.3f);
+		SpriteComponent sc = new SpriteComponent(white);
+		DrawToUI dtui = new DrawToUI();
+		Clickable cl = new Clickable(State.RUNNING, e, true);
+		rightClick.edit().add(pos).add(rd).add(cl).add(sc).add(t).add(dtui);
+
+		Entity icon = world.createEntity();
+		RenderBody iconBody = new RenderBody(TubeGame.GAME_WIDTH * .10f, TubeGame.GAME_WIDTH * .10f);
+		Position iconPos = new Position((TubeGame.GAME_WIDTH * .75f) - iconBody.width / 2, TubeGame.GAME_HEIGHT * .4f);
+		Sprite iconSprite = new Sprite(game.assManager.get("replay.png", Texture.class));
+		iconSprite.setColor(game.background);
+		iconSprite.setBounds(iconPos.x, iconPos.y, iconBody.width, iconBody.height);
+		SpriteComponent iconSC = new SpriteComponent(iconSprite);
+		icon.edit().add(dtui).add(iconBody).add(iconPos).add(iconSC);
+
+		Vector2 buttonBody = new Vector2(TubeGame.GAME_WIDTH * .1f, TubeGame.GAME_HEIGHT * .1f);
+		Vector2 buttonPos = new Vector2((TubeGame.GAME_WIDTH * .75f) - buttonBody.x / 2f, TubeGame.GAME_HEIGHT * .25f);
+		Sprite buttonSprite = new Sprite(game.assManager.get("button_background.png", Texture.class));
+		buttonSprite.setColor(game.background);
+		ButtonMaker.createButtonEntityWithText(world, buttonSprite, buttonPos, buttonBody, e, State.PAUSED,
+				new Text("Ok", new Vector2(0, 0), game.fonts.getFont(game.background, 48)));
+
 	}
 
 	private void createPointLabel() {
 		Entity title = world.createEntity();
 		DisplayScore ds = new DisplayScore(this.currentScore);
-		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f), 48, game.background);
+		Text t = new Text("", new Vector2(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f),
+				game.fonts.getFont(game.background, 48));
 		title.edit().add(t).add(ds);
 	}
 
 	private void createPauseLabel() {
 		Entity label = world.createEntity();
-		Text t = new Text("Game Ready Tap to Begin",
-				new Vector2(TubeGame.GAME_WIDTH * .5f, TubeGame.GAME_HEIGHT * .75f), 60, game.background);
+		Text t = new Text(" Game Ready\nTap to Begin",
+				new Vector2(TubeGame.GAME_WIDTH * .5f, TubeGame.GAME_HEIGHT * .75f),
+				game.fonts.getFont(game.background, 60));
 		DrawDuringState dds = new DrawDuringState(new ScreenState(State.PAUSED));
 		Position pos = new Position(0, 0);
 		RenderBody rd = new RenderBody(TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
@@ -216,14 +265,16 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		this.currentScore = new Score();
 		this.gameState = new ScreenState(State.PAUSED);
 		this.pastState = new ScreenState(State.PAUSED);
+		this.currentScore = new Score();
 		this.tubeManager = new TubeManager(this.game);
-		createWorld();
-		tubeManager.start();
-		createBackground();
+		this.createWorld();
+		tubeManager.restart();
 		createPlayer();
+		createBackground();
+		createLeftClickPanel();
+		createRightClickPanel();
 		createPointLabel();
 		createPauseLabel();
 		createForeground();
@@ -232,16 +283,14 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
 		if (delta > .1f)
 			delta = .1f;
 		world.setDelta(delta);
 		world.process();
-		if (gameState.state == State.OVER)
+		if (gameState.state == State.OVER) {
 			fadeOut();
+		}
 	}
 
 	@Override

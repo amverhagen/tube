@@ -2,15 +2,18 @@ package com.amverhagen.tube.managers;
 
 import com.amverhagen.tube.collections.LinkedListQueue;
 import com.amverhagen.tube.components.CollidableComponent;
-import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.CollidableComponent.CollisionAction;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DrawLineAroundBody;
+import com.amverhagen.tube.components.HasParent;
 import com.amverhagen.tube.components.PhysicsBody;
+import com.amverhagen.tube.components.Position;
+import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.entitymakers.CollidableMaker;
 import com.amverhagen.tube.game.TubeGame;
-import com.amverhagen.tube.tubes.Tube.Direction;
 import com.amverhagen.tube.tubes.Tube;
+import com.amverhagen.tube.tubes.Tube.Direction;
 import com.amverhagen.tube.tubes.Tube.Type;
 import com.artemis.Entity;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,7 +30,10 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 		activeTubes = new LinkedListQueue<Entity>();
 	}
 
-	public void start() {
+	public void restart() {
+		while (!activeTubes.isEmpty()) {
+			activeTubes.dequeue().deleteFromWorld();
+		}
 		this.addTube();
 		this.addTube();
 		this.addTube();
@@ -47,24 +53,34 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 			Tube newTube = new Tube(lastTube);
 			Entity eTube = newTube.returnAsEntity(world, game.assManager.get("white.png", Texture.class));
 			activeTubes.enqueue(eTube);
-			createCollidableCenterAt(newTube.getCenter(), newTube.type);
+			createCollidableCenterAt(newTube.getCenter(), newTube.type, eTube);
 			lastTube = newTube;
 		}
 	}
 
-	private void createCollidableCenterAt(Vector2 center, Type t) {
+	private void createCollidableCenterAt(Vector2 center, Type t, Entity parent) {
+		CollisionAction action = new CollisionAction() {
+			@Override
+			public void action() {
+
+			}
+		};
 		Entity tubeCenter = world.createEntity();
+		HasParent hp = new HasParent(parent);
 		PhysicsBody body = new PhysicsBody(Tube.TUBE_WIDTH, Tube.TUBE_WIDTH);
 		RenderBody rb = new RenderBody(Tube.TUBE_WIDTH, Tube.TUBE_WIDTH);
 		DrawLineAroundBody dlab = new DrawLineAroundBody();
 		Position pos = new Position(center.x - (body.width / 2), center.y - (body.height / 2));
 		CollidableComponent crc;
 		if (t == Type.SHORT) {
-			crc = new CollidableComponent(CollisionType.ORB);
+			crc = new CollidableComponent(CollisionType.ORB, action);
 		} else {
-			crc = new CollidableComponent(CollisionType.POINT);
+			crc = new CollidableComponent(CollisionType.POINT, action);
 		}
 		Deletable dc = new Deletable(false);
-		tubeCenter.edit().add(body).add(pos).add(crc).add(dc).add(dlab).add(rb);
+		tubeCenter.edit().add(body).add(pos).add(crc).add(dc).add(dlab).add(rb).add(hp);
+		CollidableMaker.createTutorialCollision(world, parent,
+				new Vector2(center.x - (body.width / 10), center.y - (body.height / 10)),
+				new Vector2(Tube.TUBE_WIDTH / 5, Tube.TUBE_WIDTH / 5));
 	}
 }

@@ -6,6 +6,7 @@ import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
+import com.amverhagen.tube.game.Colors;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.DrawTextSystem;
@@ -20,10 +21,8 @@ import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -50,6 +49,7 @@ public class MainMenuScreen implements Screen {
 		createTitle();
 		createButtons();
 		createForeground();
+		createBackground();
 	}
 
 	public void createWorld() {
@@ -76,13 +76,14 @@ public class MainMenuScreen implements Screen {
 
 	public void createTitle() {
 		Entity title = world.createEntity();
-		Text t = new Text("Tube", new Vector2(TubeGame.GAME_WIDTH / 2f, TubeGame.GAME_HEIGHT * .75f), 60);
+		Vector2 position = new Vector2(TubeGame.GAME_WIDTH / 2f, TubeGame.GAME_HEIGHT * .75f);
+		Text t = new Text("Tube", position, game.fonts.getFont(Colors.TUBE_WHITE, 60));
 		title.edit().add(t);
 	}
 
 	public void createButtons() {
 		float colorWidth = TubeGame.GAME_WIDTH / 20f;
-		Text text = new Text("Play", new Vector2(0, 0), 48);
+		Text text = new Text("Play", new Vector2(0, 0), game.fonts.getFont(Colors.TUBE_WHITE, 48));
 		ButtonMaker.createButtonEntityWithText(world,
 				new Sprite(game.assManager.get("button_background.png", Texture.class)),
 				new Vector2(TubeGame.GAME_WIDTH * .4f, colorWidth),
@@ -92,18 +93,18 @@ public class MainMenuScreen implements Screen {
 						fadeOutToGame();
 					}
 				}, State.RUNNING, text);
-		createColorButtonEntity(new Color(45f / 255f, 101f / 255f, 174f / 255f, 1), new Vector2(colorWidth, colorWidth),
+		createColorButtonEntity(Colors.TUBE_BLUE, new Vector2(colorWidth, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(new Color(0f, 0f, 0f, 1), new Vector2(TubeGame.GAME_WIDTH * .15f, colorWidth),
+		createColorButtonEntity(Colors.TUBE_BLACK, new Vector2(TubeGame.GAME_WIDTH * .15f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(new Color(1f, .5f, .5f, 1), new Vector2(TubeGame.GAME_WIDTH * .25f, colorWidth),
+		createColorButtonEntity(Colors.TUBE_PINK, new Vector2(TubeGame.GAME_WIDTH * .25f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(new Color(9f / 255f, 174f / 255f, 11f / 255f, 1),
-				new Vector2(TubeGame.GAME_WIDTH * .7f, colorWidth), new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(new Color(99f / 255f, 33f / 255f, 130f / 255f, 1),
-				new Vector2(TubeGame.GAME_WIDTH * .8f, colorWidth), new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(new Color(209f / 255, 10f / 255f, 10f / 255f, 1),
-				new Vector2(TubeGame.GAME_WIDTH * .9f, colorWidth), new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(Colors.TUBE_GREEN, new Vector2(TubeGame.GAME_WIDTH * .7f, colorWidth),
+				new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(Colors.TUBE_PURPLE, new Vector2(TubeGame.GAME_WIDTH * .8f, colorWidth),
+				new Vector2(colorWidth, colorWidth));
+		createColorButtonEntity(Colors.TUBE_RED, new Vector2(TubeGame.GAME_WIDTH * .9f, colorWidth),
+				new Vector2(colorWidth, colorWidth));
 	}
 
 	private void createColorButtonEntity(final Color c, Vector2 pos, Vector2 body) {
@@ -112,7 +113,7 @@ public class MainMenuScreen implements Screen {
 		Event event = new Event() {
 			@Override
 			public void action() {
-				game.background = new Color(c.r, c.g, c.b, 1);
+				game.background.set(c);
 				game.shapeRenderer.setColor(game.background);
 				bgSprite.setColor(game.background);
 			}
@@ -151,7 +152,6 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
-		this.createBackground();
 		this.fadeIn();
 	}
 
@@ -159,8 +159,6 @@ public class MainMenuScreen implements Screen {
 	public void render(float delta) {
 		if (delta > .1)
 			delta = .1f;
-		Gdx.gl.glClearColor(0, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		world.setDelta(delta);
 		world.process();
 	}

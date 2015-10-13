@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.components.CollidableComponent;
+import com.amverhagen.tube.components.CollidableComponent.CollisionAction;
 import com.amverhagen.tube.components.CollidableComponent.CollisionType;
 import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DrawLineAroundBody;
@@ -135,7 +136,11 @@ public class Tube {
 		float thickness = 50f;
 		for (Direction d : boundingWalls) {
 			Entity wall = world.createEntity();
-			CollidableComponent cc = new CollidableComponent(CollisionType.WALL);
+			CollidableComponent cc = new CollidableComponent(CollisionType.WALL, new CollisionAction() {
+				@Override
+				public void action() {
+				}
+			});
 			Position pos = new Position(0, 0);
 			PhysicsBody pb = new PhysicsBody(0, 0);
 			if (d == Direction.NORTH) {

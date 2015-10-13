@@ -1,10 +1,7 @@
 package com.amverhagen.tube.components;
 
-import com.amverhagen.tube.game.TubeGame;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
 
 public class Text extends com.artemis.Component {
@@ -13,21 +10,9 @@ public class Text extends com.artemis.Component {
 	public float yPos;
 	public BitmapFont font;
 
-	public Text(String text, Vector2 center, int size) {
+	public Text(String text, Vector2 center, BitmapFont bmFont) {
 		this.text = text;
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = size;
-		font = TubeGame.fontGenerator.generateFont(parameter);
-		setCenter(center);
-	}
-
-	public Text(String text, Vector2 center, int size, Color c) {
-		this.text = text;
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = size;
-		parameter.borderWidth = 3;
-		parameter.borderColor = c;
-		font = TubeGame.fontGenerator.generateFont(parameter);
+		font = bmFont;
 		setCenter(center);
 	}
 
