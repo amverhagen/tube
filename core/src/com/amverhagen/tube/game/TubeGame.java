@@ -6,6 +6,7 @@ import com.amverhagen.tube.screens.ScoreScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,12 +14,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class TubeGame extends Game {
-	public static int GAME_WIDTH = 1600;
-	public static int GAME_HEIGHT = 900;
+	public static final int GAME_WIDTH = 1600;
+	public static final int GAME_HEIGHT = 900;
 	public boolean tutorialOn;
 	public Color background;
 	public AssetManager assManager;
@@ -29,6 +31,7 @@ public class TubeGame extends Game {
 	public Viewport viewport;
 	public Viewport uiViewport;
 	public Fonts fonts;
+	private String saveFileName = "saves.txt";
 	private MainMenuScreen menuScreen;
 	private GameScreen gameScreen;
 	private ScoreScreen scoreScreen;
@@ -36,6 +39,7 @@ public class TubeGame extends Game {
 	@Override
 	public void create() {
 		this.loadAssets();
+		this.readSave();
 
 		gameCamera = new OrthographicCamera();
 		viewport = new FitViewport(GAME_WIDTH, GAME_HEIGHT, gameCamera);
@@ -73,6 +77,34 @@ public class TubeGame extends Game {
 		this.background = Colors.TUBE_BLUE;
 	}
 
+	private void readSave() {
+		try {
+			FileHandle handle = Gdx.files.local(saveFileName);
+			String currentLine = null;
+			currentLine = handle.readString();
+			if (currentLine.equals("1")) {
+				this.tutorialOn = true;
+			} else {
+				this.tutorialOn = false;
+			}
+		} catch (GdxRuntimeException ex) {
+			this.tutorialOn = false;
+		}
+	}
+
+	private void writeSave() {
+		try {
+			FileHandle handle = Gdx.files.local(saveFileName);
+			if (this.tutorialOn) {
+				handle.writeString("1", false);
+			} else {
+				handle.writeString("0", false);
+			}
+		} catch (GdxRuntimeException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 	public void setToMenuScreen() {
 		this.setScreen(menuScreen);
 	}
@@ -100,6 +132,7 @@ public class TubeGame extends Game {
 
 	@Override
 	public void dispose() {
+		this.writeSave();
 		assManager.dispose();
 		menuScreen.dispose();
 		gameScreen.dispose();

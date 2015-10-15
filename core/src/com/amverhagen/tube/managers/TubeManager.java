@@ -28,6 +28,12 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 	public TubeManager(TubeGame game) {
 		this.game = game;
 		activeTubes = new LinkedListQueue<Entity>();
+		lastTube = new Tube(new Vector2(0, 0), Type.SHORT, Direction.EAST);
+		startingPoint = lastTube.getCenter();
+	}
+
+	public void restartWithTutorialPoints() {
+		lastTube = new Tube(new Vector2(0, 0), Type.SHORT, Direction.EAST);
 	}
 
 	public void restart() {
@@ -62,7 +68,6 @@ public class TubeManager extends com.artemis.managers.GroupManager {
 		CollisionAction action = new CollisionAction() {
 			@Override
 			public void action() {
-
 			}
 		};
 		Entity tubeCenter = world.createEntity();

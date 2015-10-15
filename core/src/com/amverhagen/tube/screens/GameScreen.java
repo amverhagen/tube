@@ -1,28 +1,21 @@
 package com.amverhagen.tube.screens;
 
-import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
-import com.amverhagen.tube.components.CameraFocus;
-import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.Clickable.Event;
-import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DisplayScore;
 import com.amverhagen.tube.components.DrawDuringState;
-import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.DrawToUI;
 import com.amverhagen.tube.components.MovementDirection;
-import com.amverhagen.tube.components.MovementSpeed;
-import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.Score;
 import com.amverhagen.tube.game.TubeGame;
+import com.amverhagen.tube.managers.PlayerManager;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
 import com.amverhagen.tube.systems.BindScoreToLabelSystem;
@@ -43,7 +36,6 @@ import com.amverhagen.tube.systems.ScreenState;
 import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.systems.UpdateCenterSystem;
-import com.amverhagen.tube.tubes.Tube;
 import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
@@ -66,7 +58,7 @@ public class GameScreen implements Screen {
 	private Sprite black;
 	private TubeGame game;
 	private World world;
-	private Entity player;
+	private PlayerManager playerManager;
 	private Entity fade;
 	private TubeManager tubeManager;
 	private Score currentScore;
@@ -74,8 +66,9 @@ public class GameScreen implements Screen {
 	public GameScreen(TubeGame game) {
 		this.game = game;
 		this.tweenManager = new TweenManager();
+		this.tubeManager = new TubeManager(this.game);
+		this.playerManager = new PlayerManager(game, tubeManager.startingPoint);
 		Tween.registerAccessor(Sprite.class, new SpriteAccessor());
-
 	}
 
 	private void createWorld() {
@@ -99,33 +92,15 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(DeleteEntitySystem.class);
 		worldConfig.setManager(new TagManager());
 		worldConfig.setManager(tubeManager);
+		worldConfig.setManager(playerManager);
 		world = new World(worldConfig);
-	}
-
-	private void createPlayer() {
-		player = world.createEntity();
-		Deletable dc = new Deletable(false);
-		RenderBody renderBody = new RenderBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
-		PhysicsBody physicsBody = new PhysicsBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
-		Position position = new Position(tubeManager.startingPoint.x - renderBody.width / 2,
-				tubeManager.startingPoint.y - renderBody.height / 2);
-		Center center = new Center(position, renderBody);
-		CameraFocus cameraFocus = new CameraFocus(game.gameCamera);
-		MovementSpeed speedComp = new MovementSpeed(950f);
-		MovementDirection directionComp = new MovementDirection(MovementDirection.Direction.EAST);
-		AddConnectedPointsFromEntityCenter pointsComp = new AddConnectedPointsFromEntityCenter();
-		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
-		DrawShape renderPointsComp = new DrawShape(game.background, 5f);
-		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
-				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(dc);
-		world.getManager(TagManager.class).register("PLAYER", player);
 	}
 
 	private void createLeftClickPanel() {
 		Event e = new Event() {
 			@Override
 			public void action() {
-				player.getComponent(MovementDirection.class).shiftDirectionLeft();
+				playerManager.player.getComponent(MovementDirection.class).shiftDirectionLeft();
 			}
 		};
 		Entity leftClick = world.createEntity();
@@ -164,7 +139,7 @@ public class GameScreen implements Screen {
 		Event e = new Event() {
 			@Override
 			public void action() {
-				player.getComponent(MovementDirection.class).shiftDirectionRight();
+				playerManager.player.getComponent(MovementDirection.class).shiftDirectionRight();
 			}
 		};
 		Entity rightClick = world.createEntity();
@@ -268,10 +243,9 @@ public class GameScreen implements Screen {
 		this.gameState = new ScreenState(State.PAUSED);
 		this.pastState = new ScreenState(State.PAUSED);
 		this.currentScore = new Score();
-		this.tubeManager = new TubeManager(this.game);
 		this.createWorld();
 		tubeManager.restart();
-		createPlayer();
+		playerManager.restart();
 		createBackground();
 		createLeftClickPanel();
 		createRightClickPanel();
@@ -315,6 +289,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		world.dispose();
+		if (world != null)
+			world.dispose();
 	}
 }
