@@ -1,6 +1,6 @@
 package com.amverhagen.tube.components;
 
-import com.amverhagen.tube.systems.ScreenState;
+import com.amverhagen.tube.game.ScreenState;
 import com.badlogic.gdx.graphics.Color;
 
 public class Fadeable extends com.artemis.Component {

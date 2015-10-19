@@ -48,6 +48,14 @@ public class Tube {
 		this.setPositionFromConnectingTube(oldTube);
 		this.setBoundingWalls();
 	}
+	
+	public Tube(Tube oldTube, Type newType) {
+		this.type = newType;
+		this.direction = getDirectionFromTypeAndPreviousTube(oldTube, this.type);
+		this.bounds = getBoundsByTypeAndDirection(this.type, this.direction);
+		this.setPositionFromConnectingTube(oldTube);
+		this.setBoundingWalls();
+	}
 
 	private Direction getDirectionFromTypeAndPreviousTube(Tube oldTube, Type type) {
 		if (type == Type.COUNTER) {

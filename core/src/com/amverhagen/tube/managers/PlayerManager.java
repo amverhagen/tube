@@ -50,4 +50,12 @@ public class PlayerManager extends com.artemis.Manager {
 				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(dc);
 		world.getManager(TagManager.class).register("PLAYER", player);
 	}
+
+	public void shiftPlayerLeft() {
+		player.getComponent(MovementDirection.class).shiftDirectionLeft();
+	}
+
+	public void shiftPlayerRight() {
+		player.getComponent(MovementDirection.class).shiftDirectionRight();
+	}
 }

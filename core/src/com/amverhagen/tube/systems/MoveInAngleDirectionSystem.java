@@ -3,7 +3,7 @@ package com.amverhagen.tube.systems;
 import com.amverhagen.tube.components.AngleDirection;
 import com.amverhagen.tube.components.MovementSpeed;
 import com.amverhagen.tube.components.Position;
-import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.game.ScreenState.State;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;

@@ -22,7 +22,7 @@ public class CameraFocusSystem extends com.artemis.systems.EntityProcessingSyste
 	protected void process(Entity e) {
 		CameraFocus cameraComp = cameraMapper.get(e);
 		Center centerComp = centerMapper.get(e);
-		cameraComp.camera.position.set(centerComp.center.x, centerComp.center.y, 0);
+		cameraComp.camera.position.set(centerComp.x, centerComp.y, 0);
 		cameraComp.camera.update();
 	}
 }

@@ -1,6 +1,6 @@
 package com.amverhagen.tube.components;
 
-import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.game.ScreenState.State;
 
 public class Clickable extends com.artemis.Component {
 	public Event event;

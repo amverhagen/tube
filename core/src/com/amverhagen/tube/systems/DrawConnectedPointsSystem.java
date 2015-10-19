@@ -3,7 +3,8 @@ package com.amverhagen.tube.systems;
 import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RecordConnectedPoints.ConnectedPointList.ConnectedPoint;
-import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.game.ScreenState;
+import com.amverhagen.tube.game.ScreenState.State;
 import com.amverhagen.tube.tubes.Tube;
 import com.amverhagen.tube.components.DrawShape;
 import com.artemis.Aspect;
@@ -37,12 +38,14 @@ public class DrawConnectedPointsSystem extends com.artemis.systems.EntityProcess
 	protected void begin() {
 		this.renderer.begin();
 		this.renderer.set(ShapeType.Filled);
-		if (state.state == State.RUNNING || state.state == State.PAUSED) {
+		if (state.state != State.OVER) {
 			player = world.getManager(TagManager.class).getEntity("PLAYER");
-			playerCenter = centerMapper.get(player);
-			DrawShape renderComp = shapeMapper.get(player);
-			this.renderer.setColor(renderComp.color);
-			this.renderer.circle(playerCenter.center.x, playerCenter.center.y, Tube.TUBE_WIDTH / 5f, 1000);
+			if (player != null) {
+				playerCenter = centerMapper.get(player);
+				DrawShape renderComp = shapeMapper.get(player);
+				this.renderer.setColor(renderComp.color);
+				this.renderer.circle(playerCenter.x, playerCenter.y, Tube.TUBE_WIDTH / 5f, 1000);
+			}
 		}
 	}
 

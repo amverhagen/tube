@@ -6,8 +6,9 @@ import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.game.Score;
+import com.amverhagen.tube.game.ScreenState;
+import com.amverhagen.tube.game.ScreenState.State;
 import com.amverhagen.tube.managers.TubeManager;
-import com.amverhagen.tube.systems.ScreenState.State;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;
@@ -57,24 +58,26 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 				PhysicsBody body = physicsBodyMapper.get(e);
 				if ((playerPos.x + playerBounds.width) > (pos.x) && (playerPos.x) < (pos.x + body.width)
 						&& (playerPos.y + playerBounds.height) > (pos.y) && (playerPos.y) < (pos.y + body.height)) {
-					handleCollision(cc.type, e);
+					handleCollision(cc, e);
+					// cc.action.action();
 				}
 			}
 		}
 	}
 
-	private void handleCollision(CollidableComponent.CollisionType ct, Entity e) {
-		if (ct == CollisionType.POINT)
+	private void handleCollision(CollidableComponent cc, Entity e) {
+		if (cc.type == CollisionType.POINT)
 			score.incrementScore();
-		if (ct == CollisionType.TUT) {
+		if (cc.type == CollisionType.TUT) {
 			Deletable d = deleteMapper.get(e);
 			d.needsDeleted = true;
+			cc.action.action();
 		}
-		if (ct == CollisionType.ORB || ct == CollisionType.POINT) {
+		if (cc.type == CollisionType.ORB || cc.type == CollisionType.POINT) {
 			Deletable d = deleteMapper.get(e);
 			d.needsDeleted = true;
-			world.getManager(TubeManager.class).addTube();
-		} else if (ct == CollisionType.WALL) {
+			world.getManager(TubeManager.class).addRandomTubeToWorld();
+		} else if (cc.type == CollisionType.WALL) {
 			state.state = State.OVER;
 			playerDeletion.needsDeleted = true;
 		}

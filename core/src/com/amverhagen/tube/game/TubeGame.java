@@ -22,6 +22,7 @@ public class TubeGame extends Game {
 	public static final int GAME_WIDTH = 1600;
 	public static final int GAME_HEIGHT = 900;
 	public boolean tutorialOn;
+	public boolean soundOn;
 	public Color background;
 	public AssetManager assManager;
 	public SpriteBatch gameBatch;
@@ -31,6 +32,7 @@ public class TubeGame extends Game {
 	public Viewport viewport;
 	public Viewport uiViewport;
 	public Fonts fonts;
+	public Colors colors;
 	private String saveFileName = "saves.txt";
 	private MainMenuScreen menuScreen;
 	private GameScreen gameScreen;
@@ -65,7 +67,8 @@ public class TubeGame extends Game {
 	}
 
 	private void loadAssets() {
-		fonts = new Fonts();
+		colors = new Colors();
+		fonts = new Fonts(this);
 		assManager = new AssetManager();
 		assManager.load("black.png", Texture.class);
 		assManager.load("white.png", Texture.class);
@@ -74,7 +77,7 @@ public class TubeGame extends Game {
 		assManager.load("tube_title.png", Texture.class);
 		assManager.load("button_background.png", Texture.class);
 		assManager.finishLoading();
-		this.background = Colors.TUBE_BLUE;
+		this.background = new Color(colors.TUBE_BLUE);
 	}
 
 	private void readSave() {
@@ -85,7 +88,7 @@ public class TubeGame extends Game {
 			if (currentLine.equals("1")) {
 				this.tutorialOn = true;
 			} else {
-				this.tutorialOn = false;
+				this.tutorialOn = true;
 			}
 		} catch (GdxRuntimeException ex) {
 			this.tutorialOn = false;

@@ -1,9 +1,9 @@
 package com.amverhagen.tube.managers;
 
+import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.Text;
 import com.amverhagen.tube.game.TubeGame;
 import com.artemis.Entity;
-import com.badlogic.gdx.math.Vector2;
 
 public class ScoreManager extends com.artemis.Manager {
 	public int score;
@@ -17,7 +17,7 @@ public class ScoreManager extends com.artemis.Manager {
 
 	private void createScoreLabel() {
 		scoreLabel = world.createEntity();
-		Text t = new Text("0", new Vector2(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f),
+		Text t = new Text("0", new Center(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f),
 				game.fonts.getFont(game.background, 48));
 		scoreLabel.edit().add(t);
 	}

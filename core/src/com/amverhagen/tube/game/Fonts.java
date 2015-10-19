@@ -13,11 +13,13 @@ public class Fonts {
 	// public HashMap<String, BitmapFont> fontMap;
 	public HashMap<ColorSize, BitmapFont> fontsMap;
 	private FreeTypeFontGenerator ftfg;
+	private Color white;
 
-	public Fonts() {
+	public Fonts(TubeGame game) {
 		// fontMap = new HashMap<String, BitmapFont>();
 		fontsMap = new HashMap<ColorSize, BitmapFont>();
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/whitrabt.ttf"));
+		white = game.colors.TUBE_WHITE;
 		// FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 
 		// parameter.color = Colors.TUBE_WHITE;
@@ -28,33 +30,33 @@ public class Fonts {
 		// fontMap.put("white48", ftfg.generateFont(parameter));
 		// parameter.size = 60;
 		// fontMap.put("white60", ftfg.generateFont(parameter));
-		makeFont(new ColorSize(Colors.TUBE_WHITE, 24), false);
-		makeFont(new ColorSize(Colors.TUBE_WHITE, 48), false);
-		makeFont(new ColorSize(Colors.TUBE_WHITE, 60), false);
+		makeFont(new ColorSize(game.colors.TUBE_WHITE, 24), false);
+		makeFont(new ColorSize(game.colors.TUBE_WHITE, 48), false);
+		makeFont(new ColorSize(game.colors.TUBE_WHITE, 60), false);
 
-		makeFont(new ColorSize(Colors.TUBE_BLUE, 24), true);
-		makeFont(new ColorSize(Colors.TUBE_BLUE, 48), true);
-		makeFont(new ColorSize(Colors.TUBE_BLUE, 60), true);
+		makeFont(new ColorSize(game.colors.TUBE_BLUE, 24), true);
+		makeFont(new ColorSize(game.colors.TUBE_BLUE, 48), true);
+		makeFont(new ColorSize(game.colors.TUBE_BLUE, 60), true);
 
-		makeFont(new ColorSize(Colors.TUBE_BLACK, 24), true);
-		makeFont(new ColorSize(Colors.TUBE_BLACK, 48), true);
-		makeFont(new ColorSize(Colors.TUBE_BLACK, 60), true);
+		makeFont(new ColorSize(game.colors.TUBE_BLACK, 24), true);
+		makeFont(new ColorSize(game.colors.TUBE_BLACK, 48), true);
+		makeFont(new ColorSize(game.colors.TUBE_BLACK, 60), true);
 
-		makeFont(new ColorSize(Colors.TUBE_PINK, 24), true);
-		makeFont(new ColorSize(Colors.TUBE_PINK, 48), true);
-		makeFont(new ColorSize(Colors.TUBE_PINK, 60), true);
+		makeFont(new ColorSize(game.colors.TUBE_PINK, 24), true);
+		makeFont(new ColorSize(game.colors.TUBE_PINK, 48), true);
+		makeFont(new ColorSize(game.colors.TUBE_PINK, 60), true);
 
-		makeFont(new ColorSize(Colors.TUBE_GREEN, 24), true);
-		makeFont(new ColorSize(Colors.TUBE_GREEN, 48), true);
-		makeFont(new ColorSize(Colors.TUBE_GREEN, 60), true);
+		makeFont(new ColorSize(game.colors.TUBE_GREEN, 24), true);
+		makeFont(new ColorSize(game.colors.TUBE_GREEN, 48), true);
+		makeFont(new ColorSize(game.colors.TUBE_GREEN, 60), true);
 
-		makeFont(new ColorSize(Colors.TUBE_PURPLE, 24), true);
-		makeFont(new ColorSize(Colors.TUBE_PURPLE, 48), true);
-		makeFont(new ColorSize(Colors.TUBE_PURPLE, 60), true);
+		makeFont(new ColorSize(game.colors.TUBE_PURPLE, 24), true);
+		makeFont(new ColorSize(game.colors.TUBE_PURPLE, 48), true);
+		makeFont(new ColorSize(game.colors.TUBE_PURPLE, 60), true);
 
-		makeFont(new ColorSize(Colors.TUBE_RED, 24), true);
-		makeFont(new ColorSize(Colors.TUBE_RED, 48), true);
-		makeFont(new ColorSize(Colors.TUBE_RED, 60), true);
+		makeFont(new ColorSize(game.colors.TUBE_RED, 24), true);
+		makeFont(new ColorSize(game.colors.TUBE_RED, 48), true);
+		makeFont(new ColorSize(game.colors.TUBE_RED, 60), true);
 
 		// parameter.borderWidth = 3;
 		//
@@ -100,7 +102,7 @@ public class Fonts {
 	public void makeFont(ColorSize colorSize, boolean border) {
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = colorSize.fontSize;
-		parameter.color = Colors.TUBE_WHITE;
+		parameter.color = white;
 		parameter.borderColor = colorSize.color;
 		if (border)
 			parameter.borderWidth = 3;

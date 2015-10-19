@@ -1,6 +1,7 @@
 package com.amverhagen.tube.systems;
 
-import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.game.ScreenState;
+import com.amverhagen.tube.game.ScreenState.State;
 
 import aurelienribon.tweenengine.TweenManager;
 

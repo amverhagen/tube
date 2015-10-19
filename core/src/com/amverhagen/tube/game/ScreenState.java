@@ -1,4 +1,4 @@
-package com.amverhagen.tube.systems;
+package com.amverhagen.tube.game;
 
 public class ScreenState {
 
@@ -9,6 +9,6 @@ public class ScreenState {
 	}
 
 	public enum State {
-		FADING, PAUSED, RUNNING, OVER;
+		FADING, PAUSED, RUNNING, HINT, OVER;
 	}
 }

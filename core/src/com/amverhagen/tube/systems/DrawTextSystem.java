@@ -2,6 +2,7 @@ package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.DrawDuringState;
 import com.amverhagen.tube.components.Text;
+import com.amverhagen.tube.game.ScreenState;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;

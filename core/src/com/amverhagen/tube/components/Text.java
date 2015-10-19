@@ -2,7 +2,6 @@ package com.amverhagen.tube.components;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.math.Vector2;
 
 public class Text extends com.artemis.Component {
 	public String text;
@@ -10,13 +9,13 @@ public class Text extends com.artemis.Component {
 	public float yPos;
 	public BitmapFont font;
 
-	public Text(String text, Vector2 center, BitmapFont bmFont) {
+	public Text(String text, Center center, BitmapFont bmFont) {
 		this.text = text;
 		font = bmFont;
 		setCenter(center);
 	}
 
-	public void setCenter(Vector2 center) {
+	public void setCenter(Center center) {
 		GlyphLayout glyphLayout = new GlyphLayout();
 		glyphLayout.setText(font, text);
 		xPos = center.x - glyphLayout.width / 2;

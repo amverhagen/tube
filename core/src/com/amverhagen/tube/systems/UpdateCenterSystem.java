@@ -2,7 +2,8 @@ package com.amverhagen.tube.systems;
 
 import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.MovementDirection;
-import com.amverhagen.tube.systems.ScreenState.State;
+import com.amverhagen.tube.game.ScreenState;
+import com.amverhagen.tube.game.ScreenState.State;
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.Entity;

@@ -1,12 +1,16 @@
 package com.amverhagen.tube.screens;
 
+import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.Clickable.Event;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
-import com.amverhagen.tube.game.Colors;
+import com.amverhagen.tube.game.ScreenState;
+import com.amverhagen.tube.game.ScreenState.State;
+import com.amverhagen.tube.managers.HintButtonManager;
+import com.amverhagen.tube.managers.SoundButtonManager;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.DrawTextSystem;
@@ -14,8 +18,6 @@ import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
 import com.amverhagen.tube.systems.FadeSystem;
-import com.amverhagen.tube.systems.ScreenState;
-import com.amverhagen.tube.systems.ScreenState.State;
 import com.amverhagen.tube.systems.UiClickSystem;
 import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
@@ -61,6 +63,8 @@ public class MainMenuScreen implements Screen {
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.state));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
+		worldConfig.setManager(new SoundButtonManager(game));
+		worldConfig.setManager(new HintButtonManager(game));
 		world = new World(worldConfig);
 	}
 
@@ -77,13 +81,13 @@ public class MainMenuScreen implements Screen {
 	public void createTitle() {
 		Entity title = world.createEntity();
 		Vector2 position = new Vector2(TubeGame.GAME_WIDTH / 2f, TubeGame.GAME_HEIGHT * .75f);
-		Text t = new Text("Tube", position, game.fonts.getFont(Colors.TUBE_WHITE, 60));
+		Text t = new Text("Tube", new Center(position), game.fonts.getFont(game.colors.TUBE_WHITE, 60));
 		title.edit().add(t);
 	}
 
 	public void createButtons() {
 		float colorWidth = TubeGame.GAME_WIDTH / 20f;
-		Text text = new Text("Play", new Vector2(0, 0), game.fonts.getFont(Colors.TUBE_WHITE, 48));
+		Text text = new Text("Play", new Center(new Vector2(0, 0)), game.fonts.getFont(game.colors.TUBE_WHITE, 48));
 		ButtonMaker.createButtonEntityWithText(world,
 				new Sprite(game.assManager.get("button_background.png", Texture.class)),
 				new Vector2(TubeGame.GAME_WIDTH * .4f, colorWidth),
@@ -93,17 +97,17 @@ public class MainMenuScreen implements Screen {
 						fadeOutToGame();
 					}
 				}, State.RUNNING, text);
-		createColorButtonEntity(Colors.TUBE_BLUE, new Vector2(colorWidth, colorWidth),
+		createColorButtonEntity(game.colors.TUBE_BLUE, new Vector2(TubeGame.GAME_WIDTH * .05f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(Colors.TUBE_BLACK, new Vector2(TubeGame.GAME_WIDTH * .15f, colorWidth),
+		createColorButtonEntity(game.colors.TUBE_BLACK, new Vector2(TubeGame.GAME_WIDTH * .15f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(Colors.TUBE_PINK, new Vector2(TubeGame.GAME_WIDTH * .25f, colorWidth),
+		createColorButtonEntity(game.colors.TUBE_PINK, new Vector2(TubeGame.GAME_WIDTH * .25f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(Colors.TUBE_GREEN, new Vector2(TubeGame.GAME_WIDTH * .7f, colorWidth),
+		createColorButtonEntity(game.colors.TUBE_GREEN, new Vector2(TubeGame.GAME_WIDTH * .7f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(Colors.TUBE_PURPLE, new Vector2(TubeGame.GAME_WIDTH * .8f, colorWidth),
+		createColorButtonEntity(game.colors.TUBE_PURPLE, new Vector2(TubeGame.GAME_WIDTH * .8f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
-		createColorButtonEntity(Colors.TUBE_RED, new Vector2(TubeGame.GAME_WIDTH * .9f, colorWidth),
+		createColorButtonEntity(game.colors.TUBE_RED, new Vector2(TubeGame.GAME_WIDTH * .9f, colorWidth),
 				new Vector2(colorWidth, colorWidth));
 	}
 
