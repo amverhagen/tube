@@ -12,10 +12,10 @@ public class ScoreManager extends com.artemis.Manager {
 
 	public ScoreManager(TubeGame game) {
 		this.game = game;
-		createScoreLabel();
 	}
 
-	private void createScoreLabel() {
+	@Override
+	protected void initialize() {
 		scoreLabel = world.createEntity();
 		Text t = new Text("0", new Center(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f),
 				game.fonts.getFont(game.background, 48));

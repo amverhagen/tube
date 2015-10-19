@@ -3,7 +3,6 @@ package com.amverhagen.tube.managers;
 import com.amverhagen.tube.components.AddConnectedPointsFromEntityCenter;
 import com.amverhagen.tube.components.CameraFocus;
 import com.amverhagen.tube.components.Center;
-import com.amverhagen.tube.components.Deletable;
 import com.amverhagen.tube.components.DrawShape;
 import com.amverhagen.tube.components.MovementDirection;
 import com.amverhagen.tube.components.MovementSpeed;
@@ -11,10 +10,10 @@ import com.amverhagen.tube.components.PhysicsBody;
 import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RecordConnectedPoints;
 import com.amverhagen.tube.components.RenderBody;
+import com.amverhagen.tube.components.MovementDirection.Direction;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.tubes.Tube;
 import com.artemis.Entity;
-import com.artemis.managers.TagManager;
 import com.badlogic.gdx.math.Vector2;
 
 public class PlayerManager extends com.artemis.Manager {
@@ -27,14 +26,22 @@ public class PlayerManager extends com.artemis.Manager {
 		this.startingPoint = startingPoint;
 	}
 
-	public void restart() {
-		player = null;
+	protected void initialize() {
+		player = world.createEntity();
 		createPlayer();
 	}
 
+	public void restart() {
+		RenderBody renderBody = player.getComponent(RenderBody.class);
+		Position playerPosition = player.getComponent(Position.class);
+		playerPosition.x = (startingPoint.x - renderBody.width / 2);
+		playerPosition.y = (startingPoint.y - renderBody.height / 2);
+		player.getComponent(MovementDirection.class).direction = Direction.EAST;
+		player.edit().remove(RecordConnectedPoints.class);
+		player.edit().add(new RecordConnectedPoints(20));
+	}
+
 	private void createPlayer() {
-		player = world.createEntity();
-		Deletable dc = new Deletable(false);
 		RenderBody renderBody = new RenderBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
 		PhysicsBody physicsBody = new PhysicsBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
 		Position position = new Position(startingPoint.x - renderBody.width / 2,
@@ -47,8 +54,7 @@ public class PlayerManager extends com.artemis.Manager {
 		RecordConnectedPoints recordComp = new RecordConnectedPoints(20);
 		DrawShape renderPointsComp = new DrawShape(game.background, 5f);
 		player.edit().add(physicsBody).add(position).add(renderBody).add(center).add(cameraFocus).add(speedComp)
-				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp).add(dc);
-		world.getManager(TagManager.class).register("PLAYER", player);
+				.add(directionComp).add(pointsComp).add(recordComp).add(renderPointsComp);
 	}
 
 	public void shiftPlayerLeft() {

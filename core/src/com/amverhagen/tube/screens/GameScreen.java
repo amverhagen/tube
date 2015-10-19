@@ -3,7 +3,6 @@ package com.amverhagen.tube.screens;
 import com.amverhagen.tube.components.Center;
 import com.amverhagen.tube.components.Clickable;
 import com.amverhagen.tube.components.Clickable.Event;
-import com.amverhagen.tube.components.DisplayScore;
 import com.amverhagen.tube.components.DrawDuringState;
 import com.amverhagen.tube.components.DrawToBackground;
 import com.amverhagen.tube.components.DrawToForeground;
@@ -11,16 +10,15 @@ import com.amverhagen.tube.components.Position;
 import com.amverhagen.tube.components.RenderBody;
 import com.amverhagen.tube.components.SpriteComponent;
 import com.amverhagen.tube.components.Text;
-import com.amverhagen.tube.game.Score;
 import com.amverhagen.tube.game.ScreenState;
 import com.amverhagen.tube.game.ScreenState.State;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.InputPanelManager;
 import com.amverhagen.tube.managers.PlayerManager;
+import com.amverhagen.tube.managers.ScoreManager;
 import com.amverhagen.tube.managers.TubeManager;
 import com.amverhagen.tube.managers.TutorialPanelManager;
 import com.amverhagen.tube.systems.AddConnectedPointsFromEntityCenterSystem;
-import com.amverhagen.tube.systems.BindScoreToLabelSystem;
 import com.amverhagen.tube.systems.CameraFocusSystem;
 import com.amverhagen.tube.systems.CheckPlayerCollisionSystem;
 import com.amverhagen.tube.systems.DeleteChildEntitySystem;
@@ -39,7 +37,6 @@ import com.amverhagen.tube.tween.SpriteAccessor;
 import com.artemis.Entity;
 import com.artemis.World;
 import com.artemis.WorldConfiguration;
-import com.artemis.managers.TagManager;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -61,7 +58,6 @@ public class GameScreen implements Screen {
 	private PlayerManager playerManager;
 	private InputPanelManager inputPanelManager;
 	private TutorialPanelManager tutPanelManager;
-	private Score currentScore;
 
 	public GameScreen(TubeGame game) {
 		this.game = game;
@@ -77,7 +73,12 @@ public class GameScreen implements Screen {
 
 	private void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
-		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState, currentScore));
+		worldConfig.setManager(playerManager);
+		worldConfig.setManager(new ScoreManager(game));
+		worldConfig.setManager(tubeManager);
+		worldConfig.setManager(inputPanelManager);
+		worldConfig.setManager(tutPanelManager);
+		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
 		worldConfig.setSystem(new FadeSystem(gameState, tweenManager));
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, gameState));
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
@@ -86,27 +87,13 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.gameState));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
-		worldConfig.setSystem(new BindScoreToLabelSystem());
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
 		worldConfig.setSystem(new UpdateCenterSystem(gameState));
 		worldConfig.setSystem(new AddConnectedPointsFromEntityCenterSystem(gameState));
 		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(DeleteChildEntitySystem.class);
 		worldConfig.setSystem(DeleteEntitySystem.class);
-		worldConfig.setManager(new TagManager());
-		worldConfig.setManager(tubeManager);
-		worldConfig.setManager(playerManager);
-		worldConfig.setManager(inputPanelManager);
-		worldConfig.setManager(tutPanelManager);
 		world = new World(worldConfig);
-	}
-
-	private void createPointLabel() {
-		Entity title = world.createEntity();
-		DisplayScore ds = new DisplayScore(this.currentScore);
-		Text t = new Text("", new Center(TubeGame.GAME_WIDTH * .9f, TubeGame.GAME_HEIGHT * .9f),
-				game.fonts.getFont(game.background, 48));
-		title.edit().add(t).add(ds);
 	}
 
 	private void createPauseLabel() {
@@ -169,12 +156,11 @@ public class GameScreen implements Screen {
 	public void show() {
 		this.gameState.state = State.PAUSED;
 		this.pastState.state = State.PAUSED;
-		this.currentScore = new Score();
 		this.createWorld();
 		tubeManager.restart();
 		playerManager.restart();
+		world.getManager(ScoreManager.class).restart();
 		createBackground();
-		createPointLabel();
 		createPauseLabel();
 		createForeground();
 		this.fadeIn();

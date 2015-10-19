@@ -9,7 +9,6 @@ import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.ScreenState;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.game.ScreenState.State;
-import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
 import com.amverhagen.tube.systems.DrawToUISystem;
@@ -46,7 +45,6 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 
 	private void createWorld() {
 		WorldConfiguration wc = new WorldConfiguration();
-		wc.setSystem(BindSpriteToPositionSystem.class);
 		wc.setSystem(new FadeSystem(screenState, tweenManager));
 		wc.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
 		wc.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));

@@ -9,10 +9,9 @@ import com.amverhagen.tube.components.Text;
 import com.amverhagen.tube.entitymakers.ButtonMaker;
 import com.amverhagen.tube.game.ScreenState;
 import com.amverhagen.tube.game.ScreenState.State;
+import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.HintButtonManager;
 import com.amverhagen.tube.managers.SoundButtonManager;
-import com.amverhagen.tube.game.TubeGame;
-import com.amverhagen.tube.systems.BindSpriteToPositionSystem;
 import com.amverhagen.tube.systems.DrawTextSystem;
 import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
@@ -56,7 +55,6 @@ public class MainMenuScreen implements Screen {
 
 	public void createWorld() {
 		WorldConfiguration worldConfig = new WorldConfiguration();
-		worldConfig.setSystem(BindSpriteToPositionSystem.class);
 		worldConfig.setSystem(new FadeSystem(state, tweenManager));
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, state));
