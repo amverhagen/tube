@@ -25,7 +25,7 @@ public class Center extends com.artemis.Component {
 	}
 
 	public void updateCenter() {
-		x = position.x + (body.width / 2);
-		y = position.y + (body.height / 2);
+		x = position.x + (body.width / 2f);
+		y = position.y + (body.height / 2f);
 	}
 }

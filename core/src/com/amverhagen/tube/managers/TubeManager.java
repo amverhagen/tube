@@ -70,13 +70,15 @@ public class TubeManager extends com.artemis.Manager {
 	private void restartWithTutorial() {
 		Tube newTube = new Tube(lastTube, Type.CLOCK);
 		addTubeToWorld(newTube);
-		CollidableMaker.createTutorialCollision(world, rightTutorialAction, lastTubeEntity, lastTube.getCenter());
+		CollidableMaker.createTutorialCollision(world, rightTutorialAction, lastTubeEntity,
+				new Vector2(lastTube.getCenter().x + PlayerManager.PLAYER_WIDTH / 2f, lastTube.getCenter().y));
 
 		this.addRandomTubeToWorld();
 
 		newTube = new Tube(lastTube, Type.COUNTER);
 		addTubeToWorld(newTube);
-		CollidableMaker.createTutorialCollision(world, leftTutorialAction, lastTubeEntity, lastTube.getCenter());
+		CollidableMaker.createTutorialCollision(world, leftTutorialAction, lastTubeEntity,
+				new Vector2(lastTube.getCenter().x, lastTube.getCenter().y - PlayerManager.PLAYER_WIDTH / 2f));
 	}
 
 	public void addRandomTubeToWorld() {

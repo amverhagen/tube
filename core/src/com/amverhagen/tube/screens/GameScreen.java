@@ -78,21 +78,25 @@ public class GameScreen implements Screen {
 		worldConfig.setManager(tubeManager);
 		worldConfig.setManager(inputPanelManager);
 		worldConfig.setManager(tutPanelManager);
-		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
-		worldConfig.setSystem(new FadeSystem(gameState, tweenManager));
+
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, gameState));
+
+		worldConfig.setSystem(new UpdateCenterSystem(gameState));
+		worldConfig.setSystem(new AddConnectedPointsFromEntityCenterSystem(gameState));
+		worldConfig.setSystem(CameraFocusSystem.class);
+		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
+		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
+		worldConfig.setSystem(DeleteChildEntitySystem.class);
+		worldConfig.setSystem(DeleteEntitySystem.class);
+
+		worldConfig.setSystem(new FadeSystem(gameState, tweenManager));
 		worldConfig.setSystem(new DrawToBackgroundSystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawToGameSystem(game.gameBatch, game.gameCamera));
 		worldConfig.setSystem(new DrawConnectedPointsSystem(game.shapeRenderer, gameState));
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.gameState));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
-		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
-		worldConfig.setSystem(new UpdateCenterSystem(gameState));
-		worldConfig.setSystem(new AddConnectedPointsFromEntityCenterSystem(gameState));
-		worldConfig.setSystem(CameraFocusSystem.class);
-		worldConfig.setSystem(DeleteChildEntitySystem.class);
-		worldConfig.setSystem(DeleteEntitySystem.class);
+
 		world = new World(worldConfig);
 	}
 
@@ -169,8 +173,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		game.shapeRenderer.setProjectionMatrix(game.viewport.getCamera().combined);
-		if (delta > .1f)
-			delta = .1f;
+		delta = .016f;
 		world.setDelta(delta);
 		world.process();
 		if (gameState.state == State.OVER) {

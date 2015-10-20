@@ -22,7 +22,6 @@ public class TubeGame extends Game {
 	public static final int GAME_WIDTH = 1600;
 	public static final int GAME_HEIGHT = 900;
 	public boolean tutorialOn;
-	public boolean soundOn;
 	public Color background;
 	public AssetManager assManager;
 	public SpriteBatch gameBatch;
@@ -140,5 +139,6 @@ public class TubeGame extends Game {
 		menuScreen.dispose();
 		gameScreen.dispose();
 		scoreScreen.dispose();
+		fonts.dispose();
 	}
 }

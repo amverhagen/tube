@@ -10,26 +10,15 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 
 public class Fonts {
 
-	// public HashMap<String, BitmapFont> fontMap;
 	public HashMap<ColorSize, BitmapFont> fontsMap;
 	private FreeTypeFontGenerator ftfg;
 	private Color white;
 
 	public Fonts(TubeGame game) {
-		// fontMap = new HashMap<String, BitmapFont>();
 		fontsMap = new HashMap<ColorSize, BitmapFont>();
 		ftfg = new FreeTypeFontGenerator(Gdx.files.internal("fonts/whitrabt.ttf"));
 		white = game.colors.TUBE_WHITE;
-		// FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 
-		// parameter.color = Colors.TUBE_WHITE;
-		//
-		// parameter.size = 24;
-		// fontMap.put("white24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("white48", ftfg.generateFont(parameter));
-		// parameter.size = 60;
-		// fontMap.put("white60", ftfg.generateFont(parameter));
 		makeFont(new ColorSize(game.colors.TUBE_WHITE, 24), false);
 		makeFont(new ColorSize(game.colors.TUBE_WHITE, 48), false);
 		makeFont(new ColorSize(game.colors.TUBE_WHITE, 60), false);
@@ -58,45 +47,13 @@ public class Fonts {
 		makeFont(new ColorSize(game.colors.TUBE_RED, 48), true);
 		makeFont(new ColorSize(game.colors.TUBE_RED, 60), true);
 
-		// parameter.borderWidth = 3;
-		//
-		// parameter.size = 24;
-		// parameter.borderColor = Colors.TUBE_BLUE;
-		// fontMap.put("blue24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("blue48", ftfg.generateFont(parameter));
-		//
-		// parameter.size = 24;
-		// parameter.borderColor = Colors.TUBE_BLACK;
-		// fontMap.put("black24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("black48", ftfg.generateFont(parameter));
-		//
-		// parameter.size = 24;
-		// parameter.borderColor = Colors.TUBE_PINK;
-		// fontMap.put("pink24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("pink48", ftfg.generateFont(parameter));
-		//
-		// parameter.size = 24;
-		// parameter.borderColor = Colors.TUBE_GREEN;
-		// fontMap.put("green24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("green48", ftfg.generateFont(parameter));
-		//
-		// parameter.size = 24;
-		// parameter.borderColor = Colors.TUBE_PURPLE;
-		// fontMap.put("purple24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("purple48", ftfg.generateFont(parameter));
-		//
-		// parameter.size = 24;
-		// parameter.borderColor = Colors.TUBE_RED;
-		// fontMap.put("red24", ftfg.generateFont(parameter));
-		// parameter.size = 48;
-		// fontMap.put("red48", ftfg.generateFont(parameter));
-
 		ftfg.dispose();
+	}
+
+	public void dispose() {
+		for (BitmapFont bmp : fontsMap.values()) {
+			bmp.dispose();
+		}
 	}
 
 	public void makeFont(ColorSize colorSize, boolean border) {

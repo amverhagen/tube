@@ -17,6 +17,7 @@ import com.artemis.Entity;
 import com.badlogic.gdx.math.Vector2;
 
 public class PlayerManager extends com.artemis.Manager {
+	public static final float PLAYER_WIDTH = (Tube.TUBE_WIDTH / 5) * 2;
 	private TubeGame game;
 	private Vector2 startingPoint;
 	public Entity player;
@@ -42,8 +43,8 @@ public class PlayerManager extends com.artemis.Manager {
 	}
 
 	private void createPlayer() {
-		RenderBody renderBody = new RenderBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
-		PhysicsBody physicsBody = new PhysicsBody((Tube.TUBE_WIDTH / 5) * 2, (Tube.TUBE_WIDTH / 5) * 2);
+		RenderBody renderBody = new RenderBody(PLAYER_WIDTH, PLAYER_WIDTH);
+		PhysicsBody physicsBody = new PhysicsBody(PLAYER_WIDTH, PLAYER_WIDTH);
 		Position position = new Position(startingPoint.x - renderBody.width / 2,
 				startingPoint.y - renderBody.height / 2);
 		Center center = new Center(position, renderBody);

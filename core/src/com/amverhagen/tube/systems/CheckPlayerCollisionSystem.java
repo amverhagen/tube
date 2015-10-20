@@ -59,8 +59,10 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 	}
 
 	private void handleCollision(CollidableComponent cc, Entity e) {
-		if (cc.type == CollisionType.POINT)
+		if (cc.type == CollisionType.POINT) {
 			world.getManager(ScoreManager.class).increaseScore();
+		}
+
 		if (cc.type == CollisionType.TUT) {
 			Deletable d = deleteMapper.get(e);
 			d.needsDeleted = true;

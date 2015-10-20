@@ -11,7 +11,6 @@ import com.amverhagen.tube.game.ScreenState;
 import com.amverhagen.tube.game.ScreenState.State;
 import com.amverhagen.tube.game.TubeGame;
 import com.amverhagen.tube.managers.HintButtonManager;
-import com.amverhagen.tube.managers.SoundButtonManager;
 import com.amverhagen.tube.systems.DrawTextSystem;
 import com.amverhagen.tube.systems.DrawToBackgroundSystem;
 import com.amverhagen.tube.systems.DrawToForegroundSystem;
@@ -61,7 +60,6 @@ public class MainMenuScreen implements Screen {
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.state));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
-		worldConfig.setManager(new SoundButtonManager(game));
 		worldConfig.setManager(new HintButtonManager(game));
 		world = new World(worldConfig);
 	}
