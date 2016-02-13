@@ -19,9 +19,9 @@ public class InputPanelManager extends com.artemis.Manager {
 
 	@Override
 	protected void initialize() {
+		playerManager = world.getManager(PlayerManager.class);
 		createLeftPanel();
 		createRightPanel();
-		playerManager = world.getManager(PlayerManager.class);
 	}
 
 	private void createLeftPanel() {

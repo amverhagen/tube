@@ -71,19 +71,19 @@ public class TubeManager extends com.artemis.Manager {
 		Tube newTube = new Tube(lastTube, Type.CLOCK);
 		addTubeToWorld(newTube);
 		CollidableMaker.createTutorialCollision(world, rightTutorialAction, lastTubeEntity,
-				new Vector2(lastTube.getCenter().x + PlayerManager.PLAYER_WIDTH / 2f, lastTube.getCenter().y));
+				new Vector2(lastTube.getCenter().x + PlayerManager.PLAYER_WIDTH / 2f, lastTube.getCenter().y), true);
 
 		this.addRandomTubeToWorld();
 
 		newTube = new Tube(lastTube, Type.COUNTER);
 		addTubeToWorld(newTube);
 		CollidableMaker.createTutorialCollision(world, leftTutorialAction, lastTubeEntity,
-				new Vector2(lastTube.getCenter().x, lastTube.getCenter().y - PlayerManager.PLAYER_WIDTH / 2f));
+				new Vector2(lastTube.getCenter().x, lastTube.getCenter().y - PlayerManager.PLAYER_WIDTH / 2f), false);
 	}
 
 	public void addRandomTubeToWorld() {
 		if (activeTubes.size() <= 0) {
-			lastTubeEntity = firstTube.returnAsEntity(world, game.assManager.get("white.png", Texture.class));
+			lastTubeEntity = firstTube.returnAsEntity(world, game.assetManager.get("white.png", Texture.class));
 			activeTubes.enqueue(lastTubeEntity);
 			lastTube = firstTube;
 		} else {
@@ -91,7 +91,7 @@ public class TubeManager extends com.artemis.Manager {
 				activeTubes.dequeue().deleteFromWorld();
 			}
 			lastTube = new Tube(lastTube);
-			lastTubeEntity = lastTube.returnAsEntity(world, game.assManager.get("white.png", Texture.class));
+			lastTubeEntity = lastTube.returnAsEntity(world, game.assetManager.get("white.png", Texture.class));
 			activeTubes.enqueue(lastTubeEntity);
 			createCollidableCenterAt(lastTube.getCenter(), lastTube.type, lastTubeEntity);
 		}
@@ -102,7 +102,7 @@ public class TubeManager extends com.artemis.Manager {
 			activeTubes.dequeue().deleteFromWorld();
 		}
 		lastTube = tube;
-		lastTubeEntity = lastTube.returnAsEntity(world, game.assManager.get("white.png", Texture.class));
+		lastTubeEntity = lastTube.returnAsEntity(world, game.assetManager.get("white.png", Texture.class));
 		activeTubes.enqueue(lastTubeEntity);
 		createCollidableCenterAt(lastTube.getCenter(), lastTube.type, lastTubeEntity);
 	}

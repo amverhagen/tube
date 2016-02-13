@@ -47,13 +47,11 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 	protected void process(Entity e) {
 		if (state.state == State.RUNNING) {
 			CollidableComponent cc = collisionMapper.get(e);
-			if (cc.type != CollisionType.PLAYER) {
-				Position pos = positionMapper.get(e);
-				PhysicsBody body = physicsBodyMapper.get(e);
-				if ((playerPos.x + playerBounds.width) > (pos.x) && (playerPos.x) < (pos.x + body.width)
-						&& (playerPos.y + playerBounds.height) > (pos.y) && (playerPos.y) < (pos.y + body.height)) {
-					handleCollision(cc, e);
-				}
+			Position pos = positionMapper.get(e);
+			PhysicsBody body = physicsBodyMapper.get(e);
+			if ((playerPos.x + playerBounds.width) >= (pos.x) && (playerPos.x) <= (pos.x + body.width)
+					&& (playerPos.y + playerBounds.height) >= (pos.y) && (playerPos.y) <= (pos.y + body.height)) {
+				handleCollision(cc, e);
 			}
 		}
 	}
@@ -64,6 +62,7 @@ public class CheckPlayerCollisionSystem extends com.artemis.systems.EntityProces
 		}
 
 		if (cc.type == CollisionType.TUT) {
+			System.out.println(playerPos.x);
 			Deletable d = deleteMapper.get(e);
 			d.needsDeleted = true;
 			cc.action.action();

@@ -23,7 +23,7 @@ public class TubeGame extends Game {
 	public static final int GAME_HEIGHT = 900;
 	public boolean tutorialOn;
 	public Color background;
-	public AssetManager assManager;
+	public AssetManager assetManager;
 	public SpriteBatch gameBatch;
 	public ShapeRenderer shapeRenderer;
 	public Camera gameCamera;
@@ -68,14 +68,14 @@ public class TubeGame extends Game {
 	private void loadAssets() {
 		colors = new Colors();
 		fonts = new Fonts(this);
-		assManager = new AssetManager();
-		assManager.load("black.png", Texture.class);
-		assManager.load("white.png", Texture.class);
-		assManager.load("replay.png", Texture.class);
-		assManager.load("house.png", Texture.class);
-		assManager.load("tube_title.png", Texture.class);
-		assManager.load("button_background.png", Texture.class);
-		assManager.finishLoading();
+		assetManager = new AssetManager();
+		assetManager.load("black.png", Texture.class);
+		assetManager.load("white.png", Texture.class);
+		assetManager.load("replay.png", Texture.class);
+		assetManager.load("house.png", Texture.class);
+		assetManager.load("tube_title.png", Texture.class);
+		assetManager.load("button_background.png", Texture.class);
+		assetManager.finishLoading();
 		this.background = new Color(colors.TUBE_BLUE);
 	}
 
@@ -135,7 +135,7 @@ public class TubeGame extends Game {
 	@Override
 	public void dispose() {
 		this.writeSave();
-		assManager.dispose();
+		assetManager.dispose();
 		menuScreen.dispose();
 		gameScreen.dispose();
 		scoreScreen.dispose();

@@ -66,7 +66,7 @@ public class MainMenuScreen implements Screen {
 
 	private void createBackground() {
 		Entity bg = world.createEntity();
-		bgSprite = new Sprite(game.assManager.get("white.png", Texture.class));
+		bgSprite = new Sprite(game.assetManager.get("white.png", Texture.class));
 		SpriteComponent sc = new SpriteComponent(bgSprite);
 		sc.sprite.setBounds(0, 0, TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
 		sc.sprite.setColor(game.background);
@@ -85,7 +85,7 @@ public class MainMenuScreen implements Screen {
 		float colorWidth = TubeGame.GAME_WIDTH / 20f;
 		Text text = new Text("Play", new Center(new Vector2(0, 0)), game.fonts.getFont(game.colors.TUBE_WHITE, 48));
 		ButtonMaker.createButtonEntityWithText(world,
-				new Sprite(game.assManager.get("button_background.png", Texture.class)),
+				new Sprite(game.assetManager.get("button_background.png", Texture.class)),
 				new Vector2(TubeGame.GAME_WIDTH * .4f, colorWidth),
 				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_HEIGHT * .17f), new Event() {
 					@Override
@@ -108,7 +108,7 @@ public class MainMenuScreen implements Screen {
 	}
 
 	private void createColorButtonEntity(final Color c, Vector2 pos, Vector2 body) {
-		Sprite sprite = new Sprite(game.assManager.get("white.png", Texture.class));
+		Sprite sprite = new Sprite(game.assetManager.get("white.png", Texture.class));
 		sprite.setColor(c);
 		Event event = new Event() {
 			@Override
@@ -123,7 +123,7 @@ public class MainMenuScreen implements Screen {
 
 	public void createForeground() {
 		Entity e = world.createEntity();
-		fgSprite = new Sprite(game.assManager.get("black.png", Texture.class));
+		fgSprite = new Sprite(game.assetManager.get("black.png", Texture.class));
 		fgSprite.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
 		SpriteComponent sc = new SpriteComponent(fgSprite);
 		DrawToForeground dtfc = new DrawToForeground();

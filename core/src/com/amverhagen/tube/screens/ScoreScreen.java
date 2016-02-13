@@ -55,7 +55,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 
 	private void createBackground() {
 		Entity bg = world.createEntity();
-		Sprite bgs = new Sprite(game.assManager.get("white.png", Texture.class));
+		Sprite bgs = new Sprite(game.assetManager.get("white.png", Texture.class));
 		SpriteComponent sc = new SpriteComponent(bgs);
 		sc.sprite.setBounds(0, 0, TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
 		sc.sprite.setColor(game.background);
@@ -64,7 +64,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 	}
 
 	private void createButtons() {
-		Sprite sprite = new Sprite(game.assManager.get("button_background.png", Texture.class));
+		Sprite sprite = new Sprite(game.assetManager.get("button_background.png", Texture.class));
 		ButtonMaker.createButtonEntity(world, sprite, new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 20f),
 				new Vector2(TubeGame.GAME_WIDTH * .2f, TubeGame.GAME_WIDTH / 10f), new Event() {
 					@Override
@@ -98,7 +98,7 @@ public class ScoreScreen implements com.badlogic.gdx.Screen {
 
 	public void createForeground() {
 		Entity e = world.createEntity();
-		black = new Sprite(game.assManager.get("black.png", Texture.class));
+		black = new Sprite(game.assetManager.get("black.png", Texture.class));
 		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();

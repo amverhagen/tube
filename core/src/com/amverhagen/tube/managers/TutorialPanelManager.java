@@ -60,7 +60,7 @@ public class TutorialPanelManager extends com.artemis.Manager {
 		leftText = new Text("    Press left side to\n rotate counter clockwise",
 				new Center(TubeGame.GAME_WIDTH * .25f, TubeGame.GAME_HEIGHT * .75f),
 				game.fonts.getFont(game.background, 48));
-		Sprite white = new Sprite(game.assManager.get("white.png", Texture.class));
+		Sprite white = new Sprite(game.assetManager.get("white.png", Texture.class));
 		white.setBounds(0, 0, rd.width, rd.height);
 		white.setAlpha(.3f);
 		SpriteComponent sc = new SpriteComponent(white);
@@ -69,7 +69,7 @@ public class TutorialPanelManager extends com.artemis.Manager {
 		leftIcon = world.createEntity();
 		RenderBody iconBody = new RenderBody(TubeGame.GAME_WIDTH * .10f, TubeGame.GAME_WIDTH * .10f);
 		Position iconPos = new Position((TubeGame.GAME_WIDTH * .25f) - iconBody.width / 2, TubeGame.GAME_HEIGHT * .4f);
-		Sprite iconSprite = new Sprite(game.assManager.get("replay.png", Texture.class));
+		Sprite iconSprite = new Sprite(game.assetManager.get("replay.png", Texture.class));
 		iconSprite.flip(true, false);
 		iconSprite.setColor(game.background);
 		iconSprite.setBounds(iconPos.x, iconPos.y, iconBody.width, iconBody.height);
@@ -93,7 +93,7 @@ public class TutorialPanelManager extends com.artemis.Manager {
 		rightText = new Text("  Press right side\nto rotate clockwise",
 				new Center(TubeGame.GAME_WIDTH * .75f, TubeGame.GAME_HEIGHT * .75f),
 				game.fonts.getFont(game.background, 48));
-		Sprite white = new Sprite(game.assManager.get("white.png", Texture.class));
+		Sprite white = new Sprite(game.assetManager.get("white.png", Texture.class));
 		white.setBounds(TubeGame.GAME_WIDTH / 2f, 0, rd.width, rd.height);
 		white.setAlpha(.3f);
 		SpriteComponent sc = new SpriteComponent(white);
@@ -102,7 +102,7 @@ public class TutorialPanelManager extends com.artemis.Manager {
 		rightIcon = world.createEntity();
 		RenderBody iconBody = new RenderBody(TubeGame.GAME_WIDTH * .10f, TubeGame.GAME_WIDTH * .10f);
 		Position iconPos = new Position((TubeGame.GAME_WIDTH * .75f) - iconBody.width / 2, TubeGame.GAME_HEIGHT * .4f);
-		Sprite iconSprite = new Sprite(game.assManager.get("replay.png", Texture.class));
+		Sprite iconSprite = new Sprite(game.assetManager.get("replay.png", Texture.class));
 		iconSprite.setColor(game.background);
 		iconSprite.setBounds(iconPos.x, iconPos.y, iconBody.width, iconBody.height);
 		SpriteComponent iconSC = new SpriteComponent(iconSprite);

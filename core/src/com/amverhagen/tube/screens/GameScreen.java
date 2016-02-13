@@ -80,12 +80,12 @@ public class GameScreen implements Screen {
 		worldConfig.setManager(tutPanelManager);
 
 		worldConfig.setSystem(new UiClickSystem(game.uiViewport, gameState));
-
-		worldConfig.setSystem(new UpdateCenterSystem(gameState));
-		worldConfig.setSystem(new AddConnectedPointsFromEntityCenterSystem(gameState));
-		worldConfig.setSystem(CameraFocusSystem.class);
 		worldConfig.setSystem(new MoveInDirectionSystem(gameState));
+		worldConfig.setSystem(new UpdateCenterSystem(gameState));
+		worldConfig.setSystem(CameraFocusSystem.class);
+		worldConfig.setSystem(new AddConnectedPointsFromEntityCenterSystem(gameState));
 		worldConfig.setSystem(new CheckPlayerCollisionSystem(gameState));
+
 		worldConfig.setSystem(DeleteChildEntitySystem.class);
 		worldConfig.setSystem(DeleteEntitySystem.class);
 
@@ -96,6 +96,8 @@ public class GameScreen implements Screen {
 		worldConfig.setSystem(new DrawToUISystem(game.gameBatch, game.uiCamera));
 		worldConfig.setSystem(new DrawTextSystem(game.gameBatch, this.gameState));
 		worldConfig.setSystem(new DrawToForegroundSystem(game.gameBatch));
+
+		
 
 		world = new World(worldConfig);
 	}
@@ -119,7 +121,7 @@ public class GameScreen implements Screen {
 
 	private void createBackground() {
 		Entity bg = world.createEntity();
-		Sprite bgs = new Sprite(game.assManager.get("white.png", Texture.class));
+		Sprite bgs = new Sprite(game.assetManager.get("white.png", Texture.class));
 		SpriteComponent sc = new SpriteComponent(bgs);
 		sc.sprite.setBounds(0, 0, TubeGame.GAME_WIDTH, TubeGame.GAME_HEIGHT);
 		sc.sprite.setColor(game.background);
@@ -129,7 +131,7 @@ public class GameScreen implements Screen {
 
 	private void createForeground() {
 		fade = world.createEntity();
-		black = new Sprite(game.assManager.get("black.png", Texture.class));
+		black = new Sprite(game.assetManager.get("black.png", Texture.class));
 		black.setBounds(0, 0, game.uiViewport.getWorldWidth(), game.uiViewport.getWorldHeight());
 		SpriteComponent sc = new SpriteComponent(black);
 		DrawToForeground dtfc = new DrawToForeground();
@@ -195,6 +197,8 @@ public class GameScreen implements Screen {
 	public void resume() {
 		if (pastState.state == State.FADING)
 			gameState.state = State.FADING;
+		else if (pastState.state == State.HINT)
+			gameState.state = State.HINT;
 	}
 
 	@Override
